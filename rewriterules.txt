@@ -1,0 +1,10 @@
+# rename to .htaccess, if you can put them in
+
+RewriteEngine On
+RewriteRule ^/blueprints/(\d*)/(\-?\d*)/(\d*)/(\-?\d*)/(\d*)$ /blueprints/calc.php?bpid=$1&me=$2&mpe=$3&pe=$4&ind=$5 [L]
+RewriteRule ^/blueprints/xml/(\d*)/(\-?\d*)/(\-?\d*)$ /blueprints/xml/calc.php?bpid=$1&me=$2&mpe=$3 [L]
+RewriteRule ^/blueprints/(\d*)/(\-?\d*)/(\-?\d*)$  /blueprints/calc.php?bpid=$1&me=$2&pe=$3 [L]
+RewriteRule ^/shopping/(\d*)/(\-?\d*)/(\-?\d*)$  /blueprints/shopping.php?bpid=$1&me=$2&pe=$3 [L]
+RewriteRule ^/blueprints/static/(\d*)/(\d*)/(\d*)$ /blueprints/static/calc.php?bpid=$1&me=$2&mpe=$3 [L]
+RewriteRule ^/blueprints/static/(\d*)/(\-?\d*)/(\-?\d*)$ /blueprints/static/calc.php?bpid=$1&me=$2&mpe=$3 [L]
+
