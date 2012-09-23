@@ -108,6 +108,7 @@ if (array_key_exists('pricepos',$_COOKIE))
 
 <script type="text/javascript">
 pmargin=0;
+inventioncost=0;
 function runmenumbers()
 {
     me=parseInt(document.getElementById("me").value);
@@ -184,6 +185,21 @@ function runpenumbers()
     {
         timewaste=productiontime*(1-(productionmodifier/productiontime)*(prode/(1+prode)));
     }
+    if (!noinvent)
+    {
+        if (document.getElementById("inventprofit").checked)
+        {
+            pmargin2=pmargin-(inventioncost/parseInt(document.getElementById("inventruns").value));
+        }
+        else
+        {
+            pmargin2=pmargin;
+        }
+    }
+    else
+    {
+        pmargin2=pmargin;
+    }
 
     document.getElementById("petime").innerHTML=rectime(Math.floor(timewaste));
     document.getElementById("youtime").innerHTML=rectime(Math.floor(timewaste* (1 - .04 *parseInt(document.getElementById("ind").value))));
@@ -192,9 +208,9 @@ function runpenumbers()
     research=parseInt(document.getElementById("research").value);
     document.getElementById("yourpetime").innerHTML=rectime(prode*basetime*(1-(research*0.05)))
     document.getElementById("yourpepostime").innerHTML=rectime(prode*basetime*(1-(research*0.05))*0.75)
-    document.getElementById("peiskh").innerHTML=addIskCommas(Math.round(((3600/timewaste)*pmargin)*100)/100);
-    document.getElementById("youriskh").innerHTML=addIskCommas(Math.round(((3600/(timewaste* (1 - .04 *parseInt(document.getElementById("ind").value))))*pmargin)*100)/100);
-    document.getElementById("posiskh").innerHTML=addIskCommas(Math.round(((3600/((timewaste* (1 - .04 *parseInt(document.getElementById("ind").value)))*0.75))*pmargin)*100)/100);
+    document.getElementById("peiskh").innerHTML=addIskCommas(Math.round(((3600/timewaste)*pmargin2)*100)/100);
+    document.getElementById("youriskh").innerHTML=addIskCommas(Math.round(((3600/(timewaste* (1 - .04 *parseInt(document.getElementById("ind").value))))*pmargin2)*100)/100);
+    document.getElementById("posiskh").innerHTML=addIskCommas(Math.round(((3600/((timewaste* (1 - .04 *parseInt(document.getElementById("ind").value)))*0.75))*pmargin2)*100)/100);
     updatelink();
 }
 
@@ -210,7 +226,9 @@ function runinventionnumbers()
             totalcost=totalcost+Math.round((parseFloat(document.getElementById("inventquantity-"+dctypes[dctype]).innerHTML)*document.getElementById(dctypes[dctype] + "-jitaprice").innerHTML)*100)/100;
         }
        document.getElementById("inventtotalcost").innerHTML=addIskCommas(((Math.round(totalcost/(inventionchance/100))/100))*100);
+       inventioncost=totalcost/(inventionchance/100);
     }
+    runpenumbers();
 }
 
 function updatelink()
@@ -494,6 +512,11 @@ $(function() {
 
 function calculateresult()
 {
+if (noinvent)
+{
+return;
+}
+
 basechance=$('input:radio[name=basechance]:checked').val();
 encryption=parseInt(document.getElementById("encryption").value);;
 datacore1=parseInt(document.getElementById("datacore1").value);;
@@ -672,7 +695,9 @@ $stmt = $dbh->prepare($inventionsql);
 ?>
 <div id="invention">
 <h1><a href="#" class="jqModal">Invention Material Requirements</a></h1>
-<label for="inventionchance">Invention chance<label><input type=text id="inventionchance" value="40" onchange='runinventionnumbers()'>%
+<label for="inventionchance">Invention chance</label><input type=text id="inventionchance" value="40" onchange='runinventionnumbers()'>%<br>
+<label for="inventprofit">Remove from isk/hr</label><input type=checkbox id="inventprofit" onchange='runinventionnumbers()'><br>
+<label for="inventruns">Runs per invention</label><input type=test id="inventruns" value=10 onchange='runinventionnumbers()'>
 <table border=1>
 <tr><th>Datacore Name</th><th>Datacore Quantity</th><th>Datacore Cost</th></tr>
 <?
@@ -691,8 +716,14 @@ $dctype=trim($dctype,",");
 
 </table>
 </div>
+<script>noinvent=0;</script>
 <?
-}?>
+}
+else
+{
+echo "<script>noinvent=1;</script>";
+}
+?>
 
 <div id="prices" style="width:50%;position:absolute;<? echo $pricepos;?>">
 <h2>Prices</h2>
@@ -732,31 +763,15 @@ while ($row = $stmt->fetchObject())
        echo $cookieprice[$row->typeid];
     }
     else
-    {
-        $price = $memcache->get('price-type-'.$row->typeid);
-
-        if ($price)
+    { 
+        $pricedata=$memcache->get('forgesell-'.$row->typeid);
+        $values=explode("|",$pricedata);
+        $price=$values[0];
+        if (!(is_numeric($price)))
         {
-            echo $price;
+            $price=0;
         }
-        else
-        {
-            $url="http://api.eve-marketdata.com/api/item_prices2.xml?char_name=steveronuken&buysell=s&type_ids=".$row->typeid;
-            $pricexml=@file_get_contents($url);
-	    if ($pricexml===FALSE)
-            {
-               $price=0;
-            }
-            else
-            {
-            $xml=new SimpleXMLElement($pricexml);
-            $price= (float) $xml->result->rowset->row['price'][0];
-            }
-
-            $price=round($price,2);
-            $memcache->set('price-type-'.$row->typeid,$price,false,86400);
             echo $price;
-        }
     }
 
 echo "</td><td class=\"priceedit hidden\"><input style=\"text-align: right;\" type=text id=\"".$row->typeid."-priceedit\" align=right value=\"$price\" onchange=\"updateprice(".$row->typeid.")\" maxlength=10></td></tr>\n";
