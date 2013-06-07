@@ -11,15 +11,44 @@ setcookie('prices',"",time() - 3600);
 $ignoreprice=1;
 }
 
+$database='eve';
+$databasenumber=0;
+if ((array_key_exists('database',$_POST) &&  is_numeric($_POST['database']))|| (array_key_exists('database',$_GET) &&  is_numeric($_GET['database'])))
+{
+
+    if (array_key_exists('database',$_POST))
+    {
+        $dbnum=$_POST['database'];
+    }
+    else
+    {
+        $dbnum=$_GET['database'];
+    }
+
+    $sql='select id,version from evesupport.dbversions where id=?';
+
+    $stmt = $dbh->prepare($sql);
+
+    $stmt->execute(array($dbnum));
+
+    while ($row = $stmt->fetchObject()){
+        $databasenumber=$row->id;
+        $database=$row->version;
+    }
+
+}
+
+
 if (array_key_exists('blueprintname',$_POST))
 {
-$bpid=$_POST['blueprintname'];
-$sql='select typename,typeid,portionSize from invTypes where lower(typename)=lower(?)';
+$bpid=strtolower($_POST['blueprintname']);
+$bpid=str_replace(' blueprint','',$bpid);
+$sql="select typename,typeid,portionSize from $database.invTypes where lower(typename)=lower(?)";
 }
 else
 {
 $bpid=$_GET['bpid'];
-$sql='select typename,typeid,portionSize from invTypes where typeid=?';
+$sql="select typename,typeid,portionSize from $database.invTypes where typeid=?";
 }
 $stmt = $dbh->prepare($sql);
 $stmt->execute(array($bpid));
@@ -33,10 +62,11 @@ $portionsize=$row->portionSize;
 else
 {
 header('Location: index.php?error=1');
+exit;
 }
 
 
-$sql='select productionTime,wasteFactor,productivityModifier,researchProductivityTime,researchMaterialTime from invBlueprintTypes where productTypeID=?';
+$sql="select productionTime,wasteFactor,productivityModifier,researchProductivityTime,researchMaterialTime from $database.invBlueprintTypes where productTypeID=?";
 $stmt = $dbh->prepare($sql);
 $stmt->execute(array($itemid));
 $row = $stmt->fetchObject();
@@ -53,6 +83,26 @@ $mpe=$_COOKIE['mpe'];
 if (array_key_exists('industry',$_COOKIE) && is_numeric($_COOKIE['industry']))
 {
 $ind=$_COOKIE['industry'];
+}
+
+$inventionchecksql="select metaGroupID,parentTypeID from $database.invMetaTypes where typeid=?";
+
+$stmt = $dbh->prepare($inventionchecksql);
+$stmt->execute(array($itemid));
+if ($row = $stmt->fetchObject()){
+$metaGroupID=$row->metaGroupID;
+$baseid=$row->parentTypeID;
+}
+else
+{
+$metaGroupID=0;
+$baseid=0;
+}
+
+if ($metaGroupID==2)
+{
+$me=-4;
+$pe=-4;
 }
 
 
@@ -103,10 +153,16 @@ if (array_key_exists('pricepos',$_COOKIE))
   <link href="/blueprints/jqModal.css" rel="stylesheet" type="text/css"/>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
   <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+  <link href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css" rel="stylesheet" type="text/css"/>
+  <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" src="/blueprints/dataTables.currencySort.js"></script>
+
   <script src="/blueprints/format.js"></script>
   <script src="/blueprints/jqModal.js"></script>
 
 <script type="text/javascript">
+
+
 pmargin=0;
 inventioncost=0;
 function runmenumbers()
@@ -128,10 +184,15 @@ function runmenumbers()
     {
         perfect=parseInt(document.getElementById(typeid[type] + "-perfect").innerHTML);
         document.getElementById(typeid[type] + "-bp").innerHTML=addCommas(Math.round(perfect+(perfect*wasteage)));
+        basematerials.fnUpdate(addCommas(Math.round(perfect+(perfect*wasteage))),document.getElementById("basemat-"+typeid[type]),2);
         document.getElementById(typeid[type] + "-you").innerHTML=addCommas(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe)))));
+        basematerials.fnUpdate(addCommas(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe))))),document.getElementById("basemat-"+typeid[type]),3);
         document.getElementById(typeid[type] + "-cost").innerHTML=addIskCommas(Math.round(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe))))*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100);
+        basematerials.fnUpdate(addIskCommas(Math.round(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe))))*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100),document.getElementById("basemat-"+typeid[type]),4);
         document.getElementById(typeid[type] + "-perfectcost").innerHTML=addIskCommas(Math.round(perfect*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100);
-        document.getElementById(typeid[type] + "-diff").innerHTML=addCommas(Math.round(((Math.round(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe))))*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100)-(Math.round(perfect*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100))*100)/100); 
+         basematerials.fnUpdate(addIskCommas(Math.round(perfect*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100),document.getElementById("basemat-"+typeid[type]),5);
+        document.getElementById(typeid[type] + "-diff").innerHTML=addCommas(Math.round(((Math.round(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe))))*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100)-(Math.round(perfect*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100))*100)/100);
+        basematerials.fnUpdate(addCommas(Math.round(((Math.round(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe))))*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100)-(Math.round(perfect*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100))*100)/100),document.getElementById("basemat-"+typeid[type]),6); 
         total=total+Math.round(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe))))*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100;
         perfecttotal=perfecttotal+Math.round(perfect*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100;
         if (me>=Math.floor(perfect*((waste/100)/0.5)))
@@ -152,7 +213,9 @@ function runmenumbers()
             number=(number+(number*(0.25-(0.05*pe))));
         }
         document.getElementById(typeide[type] + "-extranum").innerHTML=addCommas(Math.round(number));
+        extramaterials.fnUpdate(addCommas(Math.round(number)),document.getElementById("extramat-"+typeide[type]),2);
         document.getElementById(typeide[type] + "-extracost").innerHTML=addIskCommas(Math.round((number*document.getElementById(typeide[type] + "-extradam").innerHTML*document.getElementById(typeide[type] + "-jitaprice").innerHTML)*100)/100);
+        extramaterials.fnUpdate(addIskCommas(Math.round((number*document.getElementById(typeide[type] + "-extradam").innerHTML*document.getElementById(typeide[type] + "-jitaprice").innerHTML)*100)/100),document.getElementById("extramat-"+typeide[type]),4);
         etotal=etotal+Math.round((number*document.getElementById(typeide[type] + "-extradam").innerHTML*document.getElementById(typeide[type] + "-jitaprice").innerHTML)*100)/100;
     }
 
@@ -228,7 +291,7 @@ function runinventionnumbers()
        document.getElementById("inventtotalcost").innerHTML=addIskCommas(((Math.round(totalcost/(inventionchance/100))/100))*100);
        inventioncost=totalcost/(inventionchance/100);
     }
-    runpenumbers();
+    runmenumbers();
 }
 
 function updatelink()
@@ -239,13 +302,15 @@ function updatelink()
     ind=parseInt(document.getElementById("ind").value);
     urltoshow=linkurl+me+"/"+pe+"/"+prode+"/"+ind;
     urltoxml=xmlurl+me+"/"+pe;
+    urltoxml2=xml2url+me+"/"+pe+"/"+prode+"/"+ind;
     urltostatic=staticurl+me+"/"+pe;
     urltocookie=url+"&mpe="+pe+"&ind="+ind+"&setcookie=1";
     document.getElementById("cookieme").href=urltocookie;
     document.getElementById("linkme").href=urltoshow;
     document.getElementById("xmlme").href=urltoxml;
+    document.getElementById("xml2me").href=urltoxml2;
     document.getElementById("staticme").href=urltostatic;
-    document.getElementById("clearprice").href=urltoshow+"&clearprice=1";
+    document.getElementById("clearprice").href=urltoshow+"/clearprice";
     document.getElementById("nextsearch").action="/blueprints/calc.php?mpe="+pe+"&ind="+ind;
 }
 
@@ -523,6 +588,36 @@ datacore1=parseInt(document.getElementById("datacore1").value);;
 datacore2=parseInt(document.getElementById("datacore2").value);
 metaitem=parseInt(document.getElementById("metaitem").value);
 decryptor=$('input:radio[name=decryptor]:checked').val();
+switch (decryptor)
+{
+case "none":
+document.getElementById("me").value=-4;
+document.getElementById("prode").value=-4;
+decryptor=1;
+break;
+case "0.6":
+document.getElementById("me").value=-6;
+document.getElementById("prode").value=-3;
+break;
+case "1":
+document.getElementById("me").value=-3;
+document.getElementById("prode").value=0;
+break;
+case "1.1":
+document.getElementById("me").value=-1;
+document.getElementById("prode").value=-1;
+break;
+case "1.2":
+document.getElementById("me").value=-2;
+document.getElementById("prode").value=1;
+break;
+case "1.8":
+document.getElementById("me").value=-5;
+document.getElementById("prode").value=-2;
+break;
+}
+
+
 InventionChance = Math.min((basechance * (1 + (0.01 * encryption)) * (1 + ((datacore1+datacore2) * (0.1 / (5 -metaitem))))*decryptor),100);
 document.getElementById("results").innerHTML=Math.floor(InventionChance*100)/100+"%";
 document.getElementById("inventionchance").value=Math.floor(InventionChance*100)/100;
@@ -532,7 +627,7 @@ runinventionnumbers();
 
 <?
 
-$sql='select typename from invBlueprintTypes,invTypes where typeid=productTypeID and invTypes.published=1 order by typename';
+$sql="select typename from $database.invBlueprintTypes,$database.invTypes where typeid=productTypeID and invTypes.published=1 order by typename";
 
 $stmt = $dbh->prepare($sql);
 
@@ -548,12 +643,47 @@ echo "];\n";
 ?>
 
 $(document).ready(function() {
+
+
+    basematerials=$("#basematerials").dataTable({
+            "bPaginate": false,
+            "bFilter": false,
+            "bInfo": false,
+            "bAutoWidth": false,
+            "aoColumns":[null,null,{ "sType": "currency" },{ "sType": "currency" },{ "sType": "currency" },{ "sType": "currency" },{ "sType": "currency" },null]
+    });
+    extramaterials=$("#extramaterials").dataTable({
+            "bPaginate": false,
+            "bFilter": false,
+            "bInfo": false,
+            "bAutoWidth": false,
+            "aoColumns":[null,null,null,null,{ "sType": "currency" }]
+    });
+
+
     $("input#blueprintname").autocomplete({ source: source });
     runmenumbers();
-    runpenumbers();
     runinventionnumbers();
     $('#inventiondialog').jqm();
     calculateresult();
+
+    $("td.togglebuy").click( function() {
+        buy=parseFloat($(this).parents("tr").children(".jitabuy")[0].innerHTML);
+        sell=parseFloat($(this).parents("tr").children(".jitasell")[0].innerHTML);
+        current=parseFloat($(this).parents("tr").children(".jitaprice")[0].innerHTML);
+        if (sell==current)
+        {
+            $(this).parents("tr").children(".jitaprice")[0].innerHTML=buy;
+            $(this)[0].innerHTML='B';
+        }
+        else if (buy==current)
+        {
+            $(this).parents("tr").children(".jitaprice")[0].innerHTML=sell;
+            $(this)[0].innerHTML='S';
+        }
+        runmenumbers();
+   });
+
 });
 </script>
 
@@ -580,6 +710,10 @@ color:blue;
 text-decoration:underline;
 }
 
+.togglebuy { width:1em}
+
+.dataTable { width:auto !important; clear:none !important; margin:0 !important;}
+
 </style>
 
 </head>
@@ -587,17 +721,19 @@ text-decoration:underline;
 <div class="main">
 <h1 class="title"><? if (array_key_exists("HTTP_EVE_TRUSTED",$_SERVER)) { echo "<a name='Main Item' onclick=\"CCPEVE.showMarketDetails(".$itemid.")\" class=\"marketlink\">$itemname <img src='http://image.eveonline.com/InventoryType/".$itemid."_64.png' class='icon64'></a>";} else { echo $itemname." <img src='http://image.eveonline.com/InventoryType/".$itemid."_64.png' class='icon64'>";}?></h1>
 <p>Things should now be working right for extra materials and how waste is applied there. Thanks go to <a href="https://gate.eveonline.com/Profile/Lutz%20Major">Lutz Major</a>, and other people from the forum.</p>
-<a href="" id='linkme'>Link to these details</a>&nbsp;|<a href="" id='xmlme'>XML</a>&nbsp;|<a href="" id='staticme'>Bare Tables</a>&nbsp;|<a href="" id="cookieme">Set your Industry and Production Efficiency in a cookie</a>|
+<a href="" id='linkme'>Link to these details</a>&nbsp;|<a href="" id='xmlme'>XML</a>&nbsp;||<a href="" id='xml2me'>Alternate Format XML (with times as well)</a>&nbsp;|<a href="" id='staticme'>Bare Tables</a>&nbsp;|<a href="" id="cookieme">Set your Industry and Production Efficiency in a cookie</a>|
 <a name='savebp' onclick="saveblueprint()" class="marketlink">save blueprint</a>
 <div id="mecalcs">
 <label for="me">Blueprint ME</label><input type=text value=0 id="me" size=3 style='width:3em;margin-right:1em;margin-left:1em'><div id="meslider" style='width:500px;display:inline-block;height:0.5em'></div><br>
 <label for="pe">Manufacturer PE</label><input type=text value=1 id="pe" readonly=y size=1 style='width:1em;margin-right:1em;margin-left:1em'><div id="peslider" style='width:100px;display:inline-block;height:0.5em'></div><br>
-<table border=1>
+<table border=1 id="basematerials">
+<thead>
 <tr><th>Material</th><th>Perfect</th><th>With ME waste</th><th>With your production waste</th><th>Perfect Cost</th><th>Cost</th><th>Difference</th><th>Waste Eliminated at</th></tr>
+</thead>
+<tbody>
 <?
 $max=0;
-#$sql='select invTypes.typeid typeid,invTypes.typeName name,quantity  from invTypes,invTypeMaterials where invTypeMaterials.materialTypeID=invTypes.typeID and invTypeMaterials.TypeID=?';
-$sql='select typeid,name,greatest(0,sum(quantity)) quantity from (select invTypes.typeid typeid,invTypes.typeName name,quantity  from invTypes,invTypeMaterials where invTypeMaterials.materialTypeID=invTypes.typeID and invTypeMaterials.TypeID=? union select invTypes.typeid typeid,invTypes.typeName name,invTypeMaterials.quantity*r.quantity*-1 quantity from invTypes,invTypeMaterials,ramTypeRequirements r,invBlueprintTypes bt where invTypeMaterials.materialTypeID=invTypes.typeID and invTypeMaterials.TypeID =r.requiredTypeID and r.typeID = bt.blueprintTypeID AND r.activityID = 1 and bt.productTypeID=? and r.recycle=1) t group by typeid,name';
+$sql="select typeid,name,greatest(0,sum(quantity)) quantity from (select invTypes.typeid typeid,invTypes.typeName name,quantity  from $database.invTypes,$database.invTypeMaterials where invTypeMaterials.materialTypeID=invTypes.typeID and invTypeMaterials.TypeID=? union select invTypes.typeid typeid,invTypes.typeName name,invTypeMaterials.quantity*r.quantity*-1 quantity from $database.invTypes,$database.invTypeMaterials,$database.ramTypeRequirements r,$database.invBlueprintTypes bt where invTypeMaterials.materialTypeID=invTypes.typeID and invTypeMaterials.TypeID =r.requiredTypeID and r.typeID = bt.blueprintTypeID AND r.activityID = 1 and bt.productTypeID=? and r.recycle=1) t group by typeid,name";
 $stmt = $dbh->prepare($sql);
 $stmt->execute(array($itemid,$itemid));
 $typeid="";
@@ -606,7 +742,7 @@ if ($row->quantity>0)
 {
 $name="<img src='http://image.eveonline.com/InventoryType/".$row->typeid."_32.png' class='icon32'>".$row->name;
 if  (array_key_exists("HTTP_EVE_TRUSTED",$_SERVER)) {$name = "<a name='mat-".$row->typeid."' onclick=\"CCPEVE.showMarketDetails(".$row->typeid.")\" class='marketlink'>$name</a>";}
-echo "<tr><td>".$name."</td><td id='".$row->typeid."-perfect'>".$row->quantity."<td id='".$row->typeid."-bp'>&nbsp;</td><td id='".$row->typeid."-you'>&nbsp;</td><td id='".$row->typeid."-perfectcost' align=right>&nbsp;</td><td id='".$row->typeid."-cost' align=right>&nbsp;</td><td id='".$row->typeid."-diff' align=right>&nbsp;</td><td id='".$row->typeid."-me' onclick=\"setme(".floor($row->quantity*(($wasteFactor/100)/0.5)).");\" style='color:blue;text-decoration:underline' align=right>".floor($row->quantity*(($wasteFactor/100)/0.5))."</tr>";
+echo "<tr id='basemat-".$row->typeid."'><td>".$name."</td><td id='".$row->typeid."-perfect'>".$row->quantity."<td id='".$row->typeid."-bp'>0</td><td id='".$row->typeid."-you'>0</td><td id='".$row->typeid."-perfectcost' align=right>0</td><td id='".$row->typeid."-cost' align=right>0</td><td id='".$row->typeid."-diff' align=right>0</td><td id='".$row->typeid."-me' onclick=\"setme(".floor($row->quantity*(($wasteFactor/100)/0.5)).");\" style='color:blue;text-decoration:underline' align=right>".floor($row->quantity*(($wasteFactor/100)/0.5))."</tr>";
 $typeid.=$row->typeid.",";
 $max=max($max,$row->quantity);
 }
@@ -614,40 +750,43 @@ $max=max($max,$row->quantity);
 $typeid=trim($typeid,",");
 
 ?>
+</tbody>
+<tfoot>
 <tr><td colspan=4>Total</td><td id=perfecttotal align=right>&nbsp;</td><td id=basictotal align=right>&nbsp;</td><td id='totaldifference' align=right>&nbsp;</td></tr>
 <tr><td colspan=5>Total with Extra materials</td><td id=overalltotal align=right>&nbsp;</td><td>&nbsp;</td></tr>
 <tr><td colspan=5>Sell Price</td><td id="<? echo $itemid?>-cost" align=right>&nbsp;</td><td id=profit>&nbsp;</td></tr>
+</tfoot>
 </table>
 <p>A no waste ME is: <? $nowaste=floor($max*(($wasteFactor/100)/0.5)); echo $nowaste; 
 ?></p>
 <h2>Extra Materials</h2>
-<table border=1>
-<tr><th>Material</th><th>Extra materials</th><th>Extra Materials with PE</th><th>Damage/use per job</th><th>Cost</th></tr>
+<table border=1 id="extramaterials"><thead>
+<tr><th>Material</th><th>Extra materials</th><th>Extra Materials with PE</th><th>Damage/use per job</th><th>Cost</th></tr></thead><tbody>
 <?
 $typeide="";
 $typeid2=$typeid;
-$sql="SELECT t.typeName tn, r.quantity qn, r.damagePerJob dmg,t.typeID typeid FROM ramTypeRequirements r,invTypes t,invBlueprintTypes bt,invGroups g  where r.requiredTypeID = t.typeID and r.typeID = bt.blueprintTypeID AND r.activityID = 1 and bt.productTypeID=? and g.categoryID != 16 and t.groupID = g.groupID";
+$sql="SELECT t.typeName tn, r.quantity qn, r.damagePerJob dmg,t.typeID typeid FROM $database.ramTypeRequirements r,$database.invTypes t,$database.invBlueprintTypes bt,$database.invGroups g  where r.requiredTypeID = t.typeID and r.typeID = bt.blueprintTypeID AND r.activityID = 1 and bt.productTypeID=? and g.categoryID != 16 and t.groupID = g.groupID";
 $stmt = $dbh->prepare($sql);
 $stmt->execute(array($itemid));
 while ($row = $stmt->fetchObject()){
 $name="<img src='http://image.eveonline.com/InventoryType/".$row->typeid."_32.png' class='icon32'>".$row->tn;
 if  (array_key_exists("HTTP_EVE_TRUSTED",$_SERVER)) {$name = "<a name='extramat-".$row->typeid."' onclick=\"CCPEVE.showMarketDetails(".$row->typeid.")\" class='marketlink'>$name</a>";}
-echo "<tr><td>".$name."</td><td id='".$row->typeid."-extranumperfect'>".$row->qn."</td><td id='".$row->typeid."-extranum'></td><td id='".$row->typeid."-extradam' >".$row->dmg."</td><td id='".$row->typeid."-extracost' align=right>&nbsp;</td></tr>\n";
+echo "<tr id='extramat-".$row->typeid."'><td>".$name."</td><td id='".$row->typeid."-extranumperfect'>".$row->qn."</td><td id='".$row->typeid."-extranum'></td><td id='".$row->typeid."-extradam' >".$row->dmg."</td><td id='".$row->typeid."-extracost' align=right>&nbsp;</td></tr>\n";
 $typeid2.=",".$row->typeid;
 $typeide.=",".$row->typeid;
 }
 $typeid2=trim($typeid2,",");
 $typeide=trim($typeide,",");
 
-?>
-<tr><td colspan=4>Total</td><td id="etotal"></td></tr>
+?></tbody><tfoot>
+<tr><td colspan=4>Total</td><td id="etotal"></td></tr></tfoot>
 </table>
 <p>Extra Materials have PE waste applied, if they also exist in the main list.</p>
 <h2>Skills Required</h2>
 <table border=1>
 <tr><th>Skill</th><th>Level</th></tr>
 <?
-$sql="SELECT t.typeName tn, r.quantity qn FROM ramTypeRequirements r,invTypes t,invBlueprintTypes bt,invGroups g  where r.requiredTypeID = t.typeID and r.typeID = bt.blueprintTypeID AND r.activityID = 1 and bt.productTypeID=? and g.categoryID = 16 and t.groupID = g.groupID";
+$sql="SELECT t.typeName tn, r.quantity qn FROM $database.ramTypeRequirements r,$database.invTypes t,$database.invBlueprintTypes bt,$database.invGroups g  where r.requiredTypeID = t.typeID and r.typeID = bt.blueprintTypeID AND r.activityID = 1 and bt.productTypeID=? and g.categoryID = 16 and t.groupID = g.groupID";
 $stmt = $dbh->prepare($sql);
 $stmt->execute(array($itemid));
 while ($row = $stmt->fetchObject()){
@@ -662,9 +801,9 @@ echo "<tr><td>".$row->tn."</td><td>".$row->qn."</td></tr>\n";
 <label for="prode">Blueprint PE</label><input type=text value=0 id="prode" size=3 style='width:3em;margin-right:1em;margin-left:1em'><div id="prodeslider" style='width:500px;display:inline-block;height:0.5em'></div><br>
 <label for="ind">Manufacturer Industry</label><input type=text value=1 id="ind" readonly=y size=1 style='width:1em;margin-right:1em;margin-left:1em'><div id="indslider" style='width:100px;display:inline-block;height:0.5em'></div><br>
 <table border=1>
-<tr><th>Base time</th><th>Time with PE</th><th>Your time</th><th>Your POS time</th><tr>
+<tr><th>Base time</th><th>Time with PE</th><th>Your time</th><th>Your POS time</th><th>RAA</th><tr>
 <tr><td id=basetime align=right><? echo $productiontime ?></td><td id=petime align=right>&nbsp;</td><td id=youtime align=right>&nbsp;</td><td id=youpostime align=right>&nbsp;</td></tr>
-<tr><th>iskh</th><td id="peiskh" align=right>&nbsp;</td><td id=youriskh align=right>&nbsp;</td><td id=posiskh align=right>&nbsp;</td></tr>
+<tr><th>iskh</th><td id="peiskh" align=right>&nbsp;</td><td id=youriskh align=right>&nbsp;</td><td id=posiskh align=right>&nbsp;</td><td id=raaiskh aligh=right>&nbsp;</tr>
 </table>
 <h2>Material Efficiency Research Time</h2>
 <label for="met">Metallurgy</label><input type=text value=0 id="met" size=3 style='width:3em;margin-right:1em;margin-left:1em'><div id="metslider" style='width:500px;display:inline-block;height:0.5em'></div><br>
@@ -680,21 +819,15 @@ echo "<tr><td>".$row->tn."</td><td>".$row->qn."</td></tr>\n";
 </table>
 </div>
 <?
-$inventionchecksql="select metaGroupID,parentTypeID from invMetaTypes where typeid=?";
-
-$stmt = $dbh->prepare($inventionchecksql);
-$stmt->execute(array($itemid));
-$row = $stmt->fetchObject();
 $dctype='';
-if ($row->metaGroupID == 2)
+if ($metaGroupID == 2)
 {
-$baseid=$row->parentTypeID;
 
-$inventionsql="select invTypes.typeid,invTypes.typename,ramTypeRequirements.quantity,chance from ramTypeRequirements,invBlueprintTypes,invTypes,evesupport.inventionChance where producttypeid=? and ramTypeRequirements.typeid=invBlueprintTypes.blueprintTypeID and activityid=8 and invTypes.typeid=requiredTypeID and groupid !=716 and inventionChance.typeid=producttypeid";
+$inventionsql="select invTypes.typeid,invTypes.typename,ramTypeRequirements.quantity,chance from $database.ramTypeRequirements,$database.invBlueprintTypes,$database.invTypes,evesupport.inventionChance where producttypeid=? and ramTypeRequirements.typeid=invBlueprintTypes.blueprintTypeID and activityid=8 and invTypes.typeid=requiredTypeID and groupid !=716 and inventionChance.typeid=producttypeid";
 $stmt = $dbh->prepare($inventionsql);
 ?>
 <div id="invention">
-<h1><a href="#" class="jqModal">Invention Material Requirements</a></h1>
+<h1><a href="#" class="jqModal">Invention Material Requirements</a></h1><p><a href="http://www.fuzzwork.co.uk/blueprints/inventionxml/<? echo $databasenumber ?>/<? echo $itemid ?>">xml for materials</a></p>
 <label for="inventionchance">Invention chance</label><input type=text id="inventionchance" value="40" onchange='runinventionnumbers()'>%<br>
 <label for="inventprofit">Remove from isk/hr</label><input type=checkbox id="inventprofit" onchange='runinventionnumbers()'><br>
 <label for="inventruns">Runs per invention</label><input type=test id="inventruns" value=10 onchange='runinventionnumbers()'>
@@ -708,6 +841,12 @@ echo "<tr><td>".$row->typename."</td><td id='inventquantity-".$row->typeid."' al
 $typeid2.=",".$row->typeid;
 $dctype.=",".$row->typeid;
 $chance=$row->chance;
+
+if (!isset($chance))
+{
+$chance=0;
+}
+
 }
 $typeid2=trim($typeid2,",");
 $dctype=trim($dctype,",");
@@ -736,17 +875,17 @@ if (array_key_exists("prices",$_COOKIE))
 }
 else
 {
-    $cookieprice=array();
+    $cookieprice=array(0);
 }
 
-$sql="select invTypes.typename,invTypes.typeid,if(blueprintTypeID,1,0) canmake from invTypes left join invBlueprintTypes on (invTypes.typeid= invBlueprintTypes.producttypeid) where invTypes.typeid in ($typeid2,$itemid)";
+$sql="select invTypes.typename,invTypes.typeid,if(blueprintTypeID,1,0) canmake from $database.invTypes left join $database.invBlueprintTypes on (invTypes.typeid= invBlueprintTypes.producttypeid) where invTypes.typeid in ($typeid2,$itemid)";
 $stmt = $dbh->prepare($sql);
 $stmt->execute();
 while ($row = $stmt->fetchObject())
 {
     $name="<img src='http://image.eveonline.com/InventoryType/".$row->typeid."_32.png' class='icon32'>".$row->typename;
     if  (array_key_exists("HTTP_EVE_TRUSTED",$_SERVER)) {$name = "<a name='price-".$row->typeid."' onclick=\"CCPEVE.showMarketDetails(".$row->typeid.")\" class='marketlink'>$name</a>";}
-    echo "<tr><td>".$name."</td>";
+    echo "<tr><td id='toggle-".$row->typeid."' class='togglebuy' title='Toggle buy/sell'>S</td><td>".$name."</td>";
     if ($row->canmake)
     {
         echo "<td><a href='/blueprints/".$row->typeid."/0/0' target='_blank'>make</a></td>";
@@ -757,24 +896,34 @@ while ($row = $stmt->fetchObject())
     }
 
     echo "<td id=\"".$row->typeid.'-jitaprice" align=right class=jitaprice>';
-    if (array_key_exists($row->typeid,$cookieprice) && is_numeric($cookieprice[$row->typeid])&&!$ignoreprice)
+    if (isset($cookieprice) && array_key_exists($row->typeid,$cookieprice) && is_numeric($cookieprice[$row->typeid])&&!$ignoreprice)
     {  
        $price=$cookieprice[$row->typeid];
        echo $cookieprice[$row->typeid];
     }
     else
     { 
-        $pricedata=$memcache->get('forgesell-'.$row->typeid);
-        $values=explode("|",$pricedata);
+        $pricedatasell=$memcache->get('forgesell-'.$row->typeid);
+        $pricedatabuy=$memcache->get('forgebuy-'.$row->typeid);
+        $values=explode("|",$pricedatasell);
         $price=$values[0];
         if (!(is_numeric($price)))
         {
             $price=0;
         }
             echo $price;
+        $values=explode("|",$pricedatabuy);
+        $pricebuy=$values[0];
+        if (!(is_numeric($pricebuy)))
+        {
+            $pricebuy=0;
+        }
+
+
+
     }
 
-echo "</td><td class=\"priceedit hidden\"><input style=\"text-align: right;\" type=text id=\"".$row->typeid."-priceedit\" align=right value=\"$price\" onchange=\"updateprice(".$row->typeid.")\" maxlength=10></td></tr>\n";
+echo "</td><td class=\"priceedit hidden\"><input style=\"text-align: right;\" type=text id=\"".$row->typeid."-priceedit\" align=right value=\"$price\" onchange=\"updateprice(".$row->typeid.")\" maxlength=10></td><td id=\"".$row->typeid."-jitasell\" class='hidden jitasell'>$price</td><td id=\"".$row->typeid."-jitabuy\" class='hidden jitabuy'>$pricebuy</td></tr>\n";
 }
 
 
@@ -792,25 +941,32 @@ typeide=[<? echo $typeide?>];
 typetotal=[<? echo trim(trim($typeide.",".$typeid,",").",".$itemid,",")?>];
 itemid=<? echo $itemid ?>;
 url="http://www.fuzzwork.co.uk/blueprints/calc.php?bpid=<? echo $itemid ?>";
-linkurl="http://www.fuzzwork.co.uk/blueprints/<? echo $itemid ?>/";
+linkurl="http://www.fuzzwork.co.uk/blueprints/<? echo $databasenumber."/".$itemid ?>/";
 xmlurl="http://www.fuzzwork.co.uk/blueprints/xml/<? echo $itemid ?>/";
+xml2url="http://www.fuzzwork.co.uk/blueprints/xml2/<? echo $itemid ?>/";
 staticurl="http://www.fuzzwork.co.uk/blueprints/static/<? echo $itemid ?>/";
 </script>
 <br><br>
 <div id="search" >
 <form method=post action='/blueprints/calc.php' id="nextsearch">
 <input type=text width=30 id="blueprintname" name='blueprintname' />
+<input type=hidden name="database" value="<? echo $databasenumber ?>">
 <input type=submit value="Do calculations" />
 </form>
 </div>
 <div class="jqmWindow" id="inventiondialog">
 <body>
 <form id='calculator' name='calculator'>
- <? echo $chance;?>
 <table>
 <tr><th>Base Chance</th><th>Encryption Skill</th><th>Datacore Skill 1</th><th>Datacore Skill 2</th><th>MetaItem</th><th>Decryptor</th><th>Chance</th></tr>
 <tr>
 <td class="slidercell">
+<?
+if (!isset($chance))
+{
+$chance=0;
+}
+?>
 <input type=radio name="basechance" value=20 id="bc20" onchange="calculateresult();" <? if ($chance=="0.2") { echo "checked"; }?>/><label for="bc20">20%</label><br/>
 <input type=radio name="basechance" value=25 id="bc25" onchange="calculateresult();" <? if ($chance=="0.25") { echo "checked"; }?>/><label for="bc25">25%</label><br/>
 <input type=radio name="basechance" value=30 id="bc30" onchange="calculateresult();" <? if ($chance=="0.3") { echo "checked"; }?>/><label for="bc30">30%</label><br/>
@@ -832,7 +988,7 @@ staticurl="http://www.fuzzwork.co.uk/blueprints/static/<? echo $itemid ?>/";
 <div id="slider-metaitem" style="height:200px;"></div>
 </td>
 <td class="slidercell">
-<input type=radio name="decryptor" value=1 id="dec1" checked="checked" onchange="calculateresult();"/><label for="dec1">None</label><br/>
+<input type=radio name="decryptor" value="none" id="dec1" checked="checked" onchange="calculateresult();"/><label for="dec1">None</label><br/>
 <input type=radio name="decryptor" value=0.6 id="dec2" onchange="calculateresult();"/><label for="dec2">0.6</label><br/>
 <input type=radio name="decryptor" value=1 id="dec3" onchange="calculateresult();"/><label for="dec3">1.0</label><br/>
 <input type=radio name="decryptor" value=1.1 id="dec4"  onchange="calculateresult();"/><label for="dec4">1.1</label><br/>
@@ -864,6 +1020,7 @@ staticurl="http://www.fuzzwork.co.uk/blueprints/static/<? echo $itemid ?>/";
 </tr>
 </table>
 </div>
-
+All images are  copyright 2012 CCP hf. All rights reserved. 'EVE', 'EVE Online', 'CCP', and all related logos and images are trademarks or registered trademarks of CCP hf.
+<?php include('/home/web/fuzzwork/analytics.php'); ?>
 </body>
 </html>
