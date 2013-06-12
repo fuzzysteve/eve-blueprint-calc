@@ -188,9 +188,9 @@ function runmenumbers()
         document.getElementById(typeid[type] + "-you").innerHTML=addCommas(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe)))));
         basematerials.fnUpdate(addCommas(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe))))),document.getElementById("basemat-"+typeid[type]),3);
         document.getElementById(typeid[type] + "-cost").innerHTML=addIskCommas(Math.round(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe))))*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100);
-        basematerials.fnUpdate(addIskCommas(Math.round(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe))))*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100),document.getElementById("basemat-"+typeid[type]),4);
+        basematerials.fnUpdate(addIskCommas(Math.round(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe))))*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100),document.getElementById("basemat-"+typeid[type]),5);
         document.getElementById(typeid[type] + "-perfectcost").innerHTML=addIskCommas(Math.round(perfect*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100);
-         basematerials.fnUpdate(addIskCommas(Math.round(perfect*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100),document.getElementById("basemat-"+typeid[type]),5);
+         basematerials.fnUpdate(addIskCommas(Math.round(perfect*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100),document.getElementById("basemat-"+typeid[type]),4);
         document.getElementById(typeid[type] + "-diff").innerHTML=addCommas(Math.round(((Math.round(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe))))*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100)-(Math.round(perfect*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100))*100)/100);
         basematerials.fnUpdate(addCommas(Math.round(((Math.round(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe))))*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100)-(Math.round(perfect*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100))*100)/100),document.getElementById("basemat-"+typeid[type]),6); 
         total=total+Math.round(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe))))*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100;
@@ -599,6 +599,10 @@ case "0.6":
 document.getElementById("me").value=-6;
 document.getElementById("prode").value=-3;
 break;
+case "0.9":
+document.getElementById("me").value=-2;
+document.getElementById("prode").value=-4;
+break;
 case "1":
 document.getElementById("me").value=-3;
 document.getElementById("prode").value=0;
@@ -611,9 +615,17 @@ case "1.2":
 document.getElementById("me").value=-2;
 document.getElementById("prode").value=1;
 break;
+case "1.5":
+document.getElementById("me").value=-3;
+document.getElementById("prode").value=-5;
+break;
 case "1.8":
 document.getElementById("me").value=-5;
 document.getElementById("prode").value=-2;
+break;
+case "1.9":
+document.getElementById("me").value=-3;
+document.getElementById("prode").value=-5;
 break;
 }
 
@@ -989,11 +1001,14 @@ $chance=0;
 </td>
 <td class="slidercell">
 <input type=radio name="decryptor" value="none" id="dec1" checked="checked" onchange="calculateresult();"/><label for="dec1">None</label><br/>
-<input type=radio name="decryptor" value=0.6 id="dec2" onchange="calculateresult();"/><label for="dec2">0.6</label><br/>
-<input type=radio name="decryptor" value=1 id="dec3" onchange="calculateresult();"/><label for="dec3">1.0</label><br/>
-<input type=radio name="decryptor" value=1.1 id="dec4"  onchange="calculateresult();"/><label for="dec4">1.1</label><br/>
-<input type=radio name="decryptor" value=1.2 id="dec5"  onchange="calculateresult();"/><label for="dec5">1.2</label><br/>
-<input type=radio name="decryptor" value=1.8 id="dec6"  onchange="calculateresult();"/><label for="dec6">1.8</label>
+<input type=radio name="decryptor" value=0.6 id="dec2" onchange="calculateresult();"/><label for="dec2">Augmentation 0.6</label><br/>
+<input type=radio name="decryptor" value=0.9 id="dec9" onchange="calculateresult();"/><label for="dec9">Optimized Augmentation 0.9</label><br/>
+<input type=radio name="decryptor" value=1 id="dec3" onchange="calculateresult();"/><label for="dec3">Symmetry 1.0</label><br/>
+<input type=radio name="decryptor" value=1.1 id="dec4"  onchange="calculateresult();"/><label for="dec4">Process 1.1</label><br/>
+<input type=radio name="decryptor" value=1.2 id="dec5"  onchange="calculateresult();"/><label for="dec5">Accelerant 1.2</label><br/>
+<input type=radio name="decryptor" value=1.5 id="dec7"  onchange="calculateresult();"/><label for="dec7">Parity 1.5</label><br/>
+<input type=radio name="decryptor" value=1.8 id="dec6"  onchange="calculateresult();"/><label for="dec6">Attainment 1.8</label><br/>
+<input type=radio name="decryptor" value=1.9 id="dec8"  onchange="calculateresult();"/><label for="dec8">Optimized Attainment 1.9</label><br/>
 </td>
 <td id="results"></td>
 </tr>
@@ -1006,17 +1021,18 @@ $chance=0;
                 <span class="note">Base chance is 40% for all other inventables</span><br />
         </div>
 <table>
-<tr><th>Decryptor Modifier</th><th>Decryptor Effects</th></tr>
-<tr><td>None</td><td>No chance modifier, end copy is ME -4, PE -4 </td></tr>
-<tr><td>0.6</td><td>Chance is reduced to 60% of what it was. Max runs is raised by 9.  end copy is ME -6, PE -3. Very rarely worth it.</td>
+<tr><th>Decryptor</th><th>Modifier</th><th>Decryptor Effects</th></tr>
+<tr><td>None</td><td>1</td><td>No chance modifier, end copy is ME -4, PE -4 </td></tr>
+<tr><td>Augmentation</td><td>0.6</td><td>Chance is reduced to 60% of what it was. Max runs is raised by 9.  end copy is ME -6, PE -3. Very rarely worth it.</td></tr>
+<tr><td>Optimized Augmentation</td><td>0.9</td><td>Chance is reduced to 90% of what it was. Max runs is raised by 7.  end copy is ME -2, PE -4.</td></tr>
+<tr><td>Symmetry</td><td>1.0</td><td>Chance is unaffected. Max runs is raised by 2.  End copy is ME -3, PE 0.</td>
 </tr>
-<tr><td>1.0</td><td>Chance is unaffected. Max runs is raised by 2.  end copy is ME -3, PE 0.</td>
+<tr><td>Process</td><td>1.1</td><td>Chance is raised to 110% of what it was.  End copy is ME -1, PE -1.</td></tr>
+<tr><td>Accelerant</td><td>1.2</td><td>Chance is raised to 120% of what it was. Max runs is raised by 1.  End copy is ME -2, PE 1.</td>
+<tr><td>Parity</td><td>1.5</td><td>Chance is raised to 150% of what it was. Max Runs is raised by 3. End copy is ME -3, PE -5.</td></tr>
 </tr>
-<tr><td>1.1</td><td>Chance is raised to 110% of what it was.  end copy is ME -1, PE -1.</td>
-</tr>
-<tr><td>1.2</td><td>Chance is raised to 120% of what it was. Max runs is raised by 1.  end copy is ME -2, PE 1.</td>
-</tr>
-<tr><td>1.8</td><td>Chance is raised to 180% of what it was. Max runs is raised by 4.  end copy is ME -5, PE -2.</td>
+<tr><td>Attainment</td><td>1.8</td><td>Chance is raised to 180% of what it was. Max runs is raised by 4.  end copy is ME -5, PE -2.</td>
+<tr><td>Optimized Attainment</td><td>1.9</td><td>Chance is raised to 190% of what it was. Max runs is raised by 2.  end copy is ME -3, PE -5.</td>
 </tr>
 </table>
 </div>
