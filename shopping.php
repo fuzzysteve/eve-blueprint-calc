@@ -77,9 +77,9 @@ if (array_key_exists('pricepos',$_COOKIE))
 <html>
 <head>
 <title>BP Costs -<? echo $itemname ?></title>
-  <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
-  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+  <link href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
   <script src="/blueprints/format.js"></script>
 
 <script type="text/javascript">
@@ -123,15 +123,19 @@ function runmenumbers()
         }
         document.getElementById(typeide[type] + "-extranum").innerHTML=addCommas(number);
         document.getElementById(typeide[type] + "-extracost").innerHTML=addIskCommas(Math.round((number*document.getElementById(typeide[type] + "-extradam").innerHTML*document.getElementById(typeide[type] + "-jitaprice").innerHTML)*100)/100);
+        document.getElementById(typeide[type] + "-extranumber").innerHTML=addCommas(number*runs);
+        document.getElementById(typeide[type] + "-extraruncost").innerHTML=addIskCommas(Math.round((number*document.getElementById(typeide[type] + "-extradam").innerHTML*document.getElementById(typeide[type] + "-jitaprice").innerHTML)*runs*100)/100);
         etotal=etotal+Math.round((number*document.getElementById(typeide[type] + "-extradam").innerHTML*document.getElementById(typeide[type] + "-jitaprice").innerHTML)*100)/100;
     }
 
     document.getElementById("<? echo $itemid;?>-cost").innerHTML=addIskCommas(Math.round(parseFloat(document.getElementById("<? echo $itemid;?>-jitaprice").innerHTML)*<? echo $portionsize;?>*100)/100);;
     document.getElementById("etotal").innerHTML=addIskCommas(Math.round(etotal*100)/100);
+    document.getElementById("eruntotal").innerHTML=addIskCommas(Math.round(etotal*100*runs)/100);
     document.getElementById("basictotal").innerHTML=addIskCommas(Math.round(total*100)/100);
     document.getElementById("perfecttotal").innerHTML=addIskCommas(Math.round(perfecttotal*100)/100);
     document.getElementById("runtotal").innerHTML=addIskCommas(Math.round(runtotal*100)/100);
     document.getElementById("overalltotal").innerHTML=addIskCommas(Math.round((total+etotal)*100)/100);
+    document.getElementById("overallruntotal").innerHTML=addIskCommas(Math.round((total+etotal)*runs*100)/100);
     document.getElementById("sellruntotal").innerHTML=addIskCommas(Math.round(((parseFloat(document.getElementById("<? echo $itemid;?>-jitaprice").innerHTML)*<? echo $portionsize;?>*runs))*100)/100);
 }
 
@@ -180,7 +184,7 @@ function saveprice()
                         }
                 }
         }
-   var priceurl="http://www.fuzzwork.co.uk/blueprints/prices.php";
+   var priceurl="//www.fuzzwork.co.uk/blueprints/prices.php";
    var params="prices="+stringPrice;
    ajaxRequest.open("POST",priceurl,true);
    ajaxRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -243,7 +247,6 @@ echo "];\n";
 $(document).ready(function() {
     $("input#blueprintname").autocomplete({ source: source });
     runmenumbers();
-    runpenumbers();
 });
 </script>
 
@@ -304,7 +307,7 @@ $typeid=trim($typeid,",");
 
 ?>
 <tr><td colspan=2>Total</td><td id=perfecttotal align=right>&nbsp;</td><td id=basictotal align=right>&nbsp;</td><td></td><td id=runtotal align=right>&nbsp;</td></tr>
-<tr><td colspan=3>Total with Extra materials</td><td id=overalltotal align=right>&nbsp;</td></tr>
+<tr><td colspan=3>Total with Extra materials</td><td id=overalltotal align=right>&nbsp;</td><td></td><td id='overallruntotal'></td></tr>
 <tr><td colspan=3>Sell Price</td><td id="<? echo $itemid?>-cost" align=right>&nbsp;</td><td></td><td id=sellruntotal align=right>&nbsp;</td></tr>
 </table>
 <p>A no waste ME is: <? $nowaste=floor($max*(($wasteFactor/100)/0.5)); echo $nowaste; 
@@ -321,7 +324,7 @@ $stmt->execute(array($itemid));
 while ($row = $stmt->fetchObject()){
 $name=$row->tn;
 if  (array_key_exists("HTTP_EVE_TRUSTED",$_SERVER)) {$name = "<a name='extramat-".$row->typeid."' onclick=\"CCPEVE.showMarketDetails(".$row->typeid.")\" class='marketlink'>$name</a>";}
-echo "<tr><td>".$name."</td><td id='".$row->typeid."-extranumperfect'>".$row->qn."</td><td id='".$row->typeid."-extranum'></td><td id='".$row->typeid."-extradam' >".$row->dmg."</td><td id='".$row->typeid."-extracost' align=right>&nbsp;</td><td id='".$row->typeid."-extranumer' align=right>&nbsp;</td><td id='".$row->typeid."-extraruncost' align=right>&nbsp;</td></tr>\n";
+echo "<tr><td>".$name."</td><td id='".$row->typeid."-extranumperfect'>".$row->qn."</td><td id='".$row->typeid."-extranum'></td><td id='".$row->typeid."-extradam' >".$row->dmg."</td><td id='".$row->typeid."-extracost' align=right>&nbsp;</td><td id='".$row->typeid."-extranumber' align=right>&nbsp;</td><td id='".$row->typeid."-extraruncost' align=right>&nbsp;</td></tr>\n";
 $typeid2.=",".$row->typeid;
 $typeide.=",".$row->typeid;
 }
@@ -329,7 +332,7 @@ $typeid2=trim($typeid2,",");
 $typeide=trim($typeide,",");
 
 ?>
-<tr><td colspan=4>Total</td><td id="etotal"></td></tr>
+<tr><td colspan=4>Total</td><td id="etotal"></td><td></td><td id='eruntotal'></td></tr>
 </table>
 <p>Extra Materials have PE waste applied, if they also exist in the main list.</p>
 <h2>Skills Required</h2>
@@ -408,8 +411,8 @@ typeid=[<? echo $typeid?>];
 typeide=[<? echo $typeide?>];
 typetotal=[<? echo trim(trim($typeide.",".$typeid,",").",".$itemid,",")?>];
 itemid=<? echo $itemid ?>;
-url="http://www.fuzzwork.co.uk/blueprints/calc.php?bpid=<? echo $itemid ?>";
-linkurl="http://www.fuzzwork.co.uk/blueprints/<? echo $itemid ?>/";
+url="//www.fuzzwork.co.uk/blueprints/calc.php?bpid=<? echo $itemid ?>";
+linkurl="//www.fuzzwork.co.uk/blueprints/<? echo $itemid ?>/";
 </script>
 <br><br>
 </div>

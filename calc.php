@@ -148,13 +148,13 @@ if (array_key_exists('pricepos',$_COOKIE))
 <html>
 <head>
 <title>BP Costs -<? echo $itemname ?></title>
-  <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+  <link href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
   <link href="/blueprints/main.css" rel="stylesheet" type="text/css"/>
   <link href="/blueprints/jqModal.css" rel="stylesheet" type="text/css"/>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
-  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
-  <link href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css" rel="stylesheet" type="text/css"/>
-  <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+  <link href="//ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css" rel="stylesheet" type="text/css"/>
+  <script type="text/javascript" src="//ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
   <script type="text/javascript" src="/blueprints/dataTables.currencySort.js"></script>
 
   <script src="/blueprints/format.js"></script>
@@ -358,7 +358,7 @@ function saveprice()
                         }
                 }
         }
-   var priceurl="http://www.fuzzwork.co.uk/blueprints/prices.php";
+   var priceurl="//www.fuzzwork.co.uk/blueprints/prices.php";
    var params="prices="+stringPrice;
    ajaxRequest.open("POST",priceurl,true);
    ajaxRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -395,7 +395,7 @@ function saveblueprint()
                         }
                 }
         }
-   var saveurl="http://www.fuzzwork.co.uk/blueprints/savebp.php";
+   var saveurl="//www.fuzzwork.co.uk/blueprints/savebp.php";
    var params="typeid="+itemid+"&me="+parseInt(document.getElementById("me").value)+"&pe="+parseInt(document.getElementById("prode").value);
    ajaxRequest.open("GET",saveurl+"?"+params,true);
    ajaxRequest.onreadystatechange = function() {//Call a function when the state changes.
@@ -731,7 +731,7 @@ text-decoration:underline;
 </head>
 <body>
 <div class="main">
-<h1 class="title"><? if (array_key_exists("HTTP_EVE_TRUSTED",$_SERVER)) { echo "<a name='Main Item' onclick=\"CCPEVE.showMarketDetails(".$itemid.")\" class=\"marketlink\">$itemname <img src='http://image.eveonline.com/InventoryType/".$itemid."_64.png' class='icon64'></a>";} else { echo $itemname." <img src='http://image.eveonline.com/InventoryType/".$itemid."_64.png' class='icon64'>";}?></h1>
+<h1 class="title"><? if (array_key_exists("HTTP_EVE_TRUSTED",$_SERVER)) { echo "<a name='Main Item' onclick=\"CCPEVE.showMarketDetails(".$itemid.")\" class=\"marketlink\">$itemname <img src='//image.eveonline.com/InventoryType/".$itemid."_64.png' class='icon64'></a>";} else { echo $itemname." <img src='//image.eveonline.com/InventoryType/".$itemid."_64.png' class='icon64'>";}?></h1>
 <p>Things should now be working right for extra materials and how waste is applied there. Thanks go to <a href="https://gate.eveonline.com/Profile/Lutz%20Major">Lutz Major</a>, and other people from the forum.</p>
 <a href="" id='linkme'>Link to these details</a>&nbsp;|<a href="" id='xmlme'>XML</a>&nbsp;||<a href="" id='xml2me'>Alternate Format XML (with times as well)</a>&nbsp;|<a href="" id='staticme'>Bare Tables</a>&nbsp;|<a href="" id="cookieme">Set your Industry and Production Efficiency in a cookie</a>|
 <a name='savebp' onclick="saveblueprint()" class="marketlink">save blueprint</a>
@@ -752,7 +752,7 @@ $typeid="";
 while ($row = $stmt->fetchObject()){
 if ($row->quantity>0)
 {
-$name="<img src='http://image.eveonline.com/InventoryType/".$row->typeid."_32.png' class='icon32'>".$row->name;
+$name="<img src='//image.eveonline.com/InventoryType/".$row->typeid."_32.png' class='icon32'>".$row->name;
 if  (array_key_exists("HTTP_EVE_TRUSTED",$_SERVER)) {$name = "<a name='mat-".$row->typeid."' onclick=\"CCPEVE.showMarketDetails(".$row->typeid.")\" class='marketlink'>$name</a>";}
 echo "<tr id='basemat-".$row->typeid."'><td>".$name."</td><td id='".$row->typeid."-perfect'>".$row->quantity."<td id='".$row->typeid."-bp'>0</td><td id='".$row->typeid."-you'>0</td><td id='".$row->typeid."-perfectcost' align=right>0</td><td id='".$row->typeid."-cost' align=right>0</td><td id='".$row->typeid."-diff' align=right>0</td><td id='".$row->typeid."-me' onclick=\"setme(".floor($row->quantity*(($wasteFactor/100)/0.5)).");\" style='color:blue;text-decoration:underline' align=right>".floor($row->quantity*(($wasteFactor/100)/0.5))."</tr>";
 $typeid.=$row->typeid.",";
@@ -781,7 +781,7 @@ $sql="SELECT t.typeName tn, r.quantity qn, r.damagePerJob dmg,t.typeID typeid FR
 $stmt = $dbh->prepare($sql);
 $stmt->execute(array($itemid));
 while ($row = $stmt->fetchObject()){
-$name="<img src='http://image.eveonline.com/InventoryType/".$row->typeid."_32.png' class='icon32'>".$row->tn;
+$name="<img src='//image.eveonline.com/InventoryType/".$row->typeid."_32.png' class='icon32'>".$row->tn;
 if  (array_key_exists("HTTP_EVE_TRUSTED",$_SERVER)) {$name = "<a name='extramat-".$row->typeid."' onclick=\"CCPEVE.showMarketDetails(".$row->typeid.")\" class='marketlink'>$name</a>";}
 echo "<tr id='extramat-".$row->typeid."'><td>".$name."</td><td id='".$row->typeid."-extranumperfect'>".$row->qn."</td><td id='".$row->typeid."-extranum'></td><td id='".$row->typeid."-extradam' >".$row->dmg."</td><td id='".$row->typeid."-extracost' align=right>&nbsp;</td></tr>\n";
 $typeid2.=",".$row->typeid;
@@ -839,7 +839,7 @@ $inventionsql="select invTypes.typeid,invTypes.typename,ramTypeRequirements.quan
 $stmt = $dbh->prepare($inventionsql);
 ?>
 <div id="invention">
-<h1><a href="#" class="jqModal">Invention Material Requirements</a></h1><p><a href="http://www.fuzzwork.co.uk/blueprints/inventionxml/<? echo $databasenumber ?>/<? echo $itemid ?>">xml for materials</a></p>
+<h1><a href="#" class="jqModal">Invention Material Requirements</a></h1><p><a href="//www.fuzzwork.co.uk/blueprints/inventionxml/<? echo $databasenumber ?>/<? echo $itemid ?>">xml for materials</a></p>
 <label for="inventionchance">Invention chance</label><input type=text id="inventionchance" value="40" onchange='runinventionnumbers()'>%<br>
 <label for="inventprofit">Remove from isk/hr</label><input type=checkbox id="inventprofit" onchange='runinventionnumbers()'><br>
 <label for="inventruns">Runs per invention</label><input type=test id="inventruns" value=10 onchange='runinventionnumbers()'>
@@ -895,7 +895,7 @@ $stmt = $dbh->prepare($sql);
 $stmt->execute();
 while ($row = $stmt->fetchObject())
 {
-    $name="<img src='http://image.eveonline.com/InventoryType/".$row->typeid."_32.png' class='icon32'>".$row->typename;
+    $name="<img src='//image.eveonline.com/InventoryType/".$row->typeid."_32.png' class='icon32'>".$row->typename;
     if  (array_key_exists("HTTP_EVE_TRUSTED",$_SERVER)) {$name = "<a name='price-".$row->typeid."' onclick=\"CCPEVE.showMarketDetails(".$row->typeid.")\" class='marketlink'>$name</a>";}
     echo "<tr><td id='toggle-".$row->typeid."' class='togglebuy' title='Toggle buy/sell'>S</td><td>".$name."</td>";
     if ($row->canmake)
@@ -952,11 +952,11 @@ dctypes=[<? echo $dctype?>];
 typeide=[<? echo $typeide?>];
 typetotal=[<? echo trim(trim($typeide.",".$typeid,",").",".$itemid,",")?>];
 itemid=<? echo $itemid ?>;
-url="http://www.fuzzwork.co.uk/blueprints/calc.php?bpid=<? echo $itemid ?>";
-linkurl="http://www.fuzzwork.co.uk/blueprints/<? echo $databasenumber."/".$itemid ?>/";
-xmlurl="http://www.fuzzwork.co.uk/blueprints/xml/<? echo $itemid ?>/";
-xml2url="http://www.fuzzwork.co.uk/blueprints/xml2/<? echo $itemid ?>/";
-staticurl="http://www.fuzzwork.co.uk/blueprints/static/<? echo $itemid ?>/";
+url="//www.fuzzwork.co.uk/blueprints/calc.php?bpid=<? echo $itemid ?>";
+linkurl="//www.fuzzwork.co.uk/blueprints/<? echo $databasenumber."/".$itemid ?>/";
+xmlurl="//www.fuzzwork.co.uk/blueprints/xml/<? echo $itemid ?>/";
+xml2url="//www.fuzzwork.co.uk/blueprints/xml2/<? echo $itemid ?>/";
+staticurl="//www.fuzzwork.co.uk/blueprints/static/<? echo $itemid ?>/";
 </script>
 <br><br>
 <div id="search" >

@@ -46,7 +46,7 @@ $me=$_GET['me'];
 echo "<?xml version='1.0' encoding='UTF-8'?>";
 ?>
 
-<blueprint id="<? echo $itemid; ?>" name="<? echo $itemname; ?>" productiontime="<? echo $productiontime; ?>" productionmodifier="<? echo $productionmodifier; ?>" >
+<blueprint id="<? echo $itemid; ?>" name="<? echo $itemname; ?>" productiontime="<? echo $productiontime; ?>" productionmodifier="<? echo $productionmodifier; ?>" waste="<? echo $wasteFactor;?>" >
 <basematerials>
 <?
 if ($me<0)
@@ -70,7 +70,7 @@ while ($row = $stmt->fetchObject()){
 if ($row->quantity>0)
 {
 $name=$row->name;
-echo '<material name="'.$name.'" id="'.$row->typeid.'" basequantity="'.$row->quantity.'" actualquantity="'.round($row->quantity+($row->quantity*$wasteage)+($row->quantity*(0.25-(0.05*$pe)))).'" condensed="'.$name.';'.$row->typeid.';'.$row->quantity.';'.round($row->quantity+($row->quantity*$wasteage)+($row->quantity*(0.25-(0.05*$pe)))).'"/>'."\n";
+echo '<material name="'.$name.'" id="'.$row->typeid.'" basequantity="'.$row->quantity.'" actualquantity="'.round($row->quantity+($row->quantity*$wasteage)+($row->quantity*(0.25-(0.05*$pe)))).'" condensed="'.$name.';'.$row->typeid.';'.$row->quantity.';'.round($row->quantity+($row->quantity*$wasteage)+($row->quantity*(0.25-(0.05*$pe)))).';1;1;1"/>'."\n";
 $typeid[$row->typeid]=1;
 $typeamount[$row->typeid]=$row->quantity;
 $typeactual[$row->typeid]=round($row->quantity+($row->quantity*$wasteage)+($row->quantity*(0.25-(0.05*$pe))));
@@ -103,7 +103,7 @@ $typename[$row->typeid]=$name;
 $typeid[$row->typeid]=1;
 }
 
-echo '<material name="'.$name.'" id="'.$row->typeid.'" quantity="'.$row->qn.'" damage="'.$row->dmg.'" actualquantity="'.$actual.'" recyclable="'.$row->recycle.'" condensed="'.$name.';'.$row->typeid.';'.$row->qn.';'.$actual.';'.$row->dmg.';'.$row->recycle.'" />'."\n";
+echo '<material name="'.$name.'" id="'.$row->typeid.'" quantity="'.$row->qn.'" damage="'.$row->dmg.'" actualquantity="'.$actual.'" recyclable="'.$row->recycle.'" condensed="'.$name.';'.$row->typeid.';'.$row->qn.';'.$actual.';'.$row->dmg.';'.$row->recycle.';0" />'."\n";
 }
 
 echo "</extramaterials>\n";
