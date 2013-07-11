@@ -66,7 +66,7 @@ exit;
 }
 
 
-$sql="select productionTime,wasteFactor,productivityModifier,researchProductivityTime,researchMaterialTime from $database.invBlueprintTypes where productTypeID=?";
+$sql="select productionTime,wasteFactor,productivityModifier,researchProductivityTime,researchMaterialTime,maxProductionLimit from $database.invBlueprintTypes where productTypeID=?";
 $stmt = $dbh->prepare($sql);
 $stmt->execute(array($itemid));
 $row = $stmt->fetchObject();
@@ -75,6 +75,7 @@ $productiontime=$row->productionTime;
 $productionmodifier=$row->productivityModifier;
 $researchProductivityTime=$row->researchProductivityTime;
 $researchMaterialTime=$row->researchMaterialTime;
+$maxruns=$row->maxProductionLimit/10;
 
 if (array_key_exists('mpe',$_COOKIE) && is_numeric($_COOKIE['mpe']))
 {
@@ -288,6 +289,23 @@ function runinventionnumbers()
             document.getElementById("inventcost-"+dctypes[dctype]).innerHTML=addIskCommas(Math.round((parseFloat(document.getElementById("inventquantity-"+dctypes[dctype]).innerHTML)*document.getElementById(dctypes[dctype] + "-jitaprice").innerHTML)*100)/100);
             totalcost=totalcost+Math.round((parseFloat(document.getElementById("inventquantity-"+dctypes[dctype]).innerHTML)*document.getElementById(dctypes[dctype] + "-jitaprice").innerHTML)*100)/100;
         }
+        decryptor=$('input:radio[name=decryptor]:checked').val();
+        if (decryptor != "none" )
+        { 
+            document.getElementById("displaydecryptor").innerHTML=document.getElementById("decryptorname-"+decryptor).innerHTML;
+            document.getElementById("displaydecryptorq").innerHTML=1;
+            document.getElementById("displaydecryptorc").innerHTML=addIskCommas(document.getElementById(document.getElementById("decryptorid-"+decryptor).innerHTML + "-jitaprice").innerHTML);
+            totalcost=totalcost+parseFloat(document.getElementById(document.getElementById("decryptorid-"+decryptor).innerHTML + "-jitaprice").innerHTML);
+            
+        }
+        else
+        {
+            document.getElementById("displaydecryptor").innerHTML="No Decryptor";
+            document.getElementById("displaydecryptorq").innerHTML=0;
+            document.getElementById("displaydecryptorc").innerHTML=0;
+        }
+
+
        document.getElementById("inventtotalcost").innerHTML=addIskCommas(((Math.round(totalcost/(inventionchance/100))/100))*100);
        inventioncost=totalcost/(inventionchance/100);
     }
@@ -594,18 +612,22 @@ case "none":
 document.getElementById("me").value=-4;
 document.getElementById("prode").value=-4;
 decryptor=1;
+document.getElementById("inventruns").value=document.getElementById("baseruns").value;
 break;
 case "0.6":
 document.getElementById("me").value=-6;
 document.getElementById("prode").value=-3;
+document.getElementById("inventruns").value=parseInt(document.getElementById("baseruns").value)+9;
 break;
 case "0.9":
 document.getElementById("me").value=-2;
 document.getElementById("prode").value=-4;
+document.getElementById("inventruns").value=parseInt(document.getElementById("baseruns").value)+7;
 break;
 case "1":
 document.getElementById("me").value=-3;
 document.getElementById("prode").value=0;
+document.getElementById("inventruns").value=parseInt(document.getElementById("baseruns").value)+2;
 break;
 case "1.1":
 document.getElementById("me").value=-1;
@@ -614,18 +636,22 @@ break;
 case "1.2":
 document.getElementById("me").value=-2;
 document.getElementById("prode").value=1;
+document.getElementById("inventruns").value=parseInt(document.getElementById("baseruns").value)+1;
 break;
 case "1.5":
 document.getElementById("me").value=-3;
 document.getElementById("prode").value=-5;
+document.getElementById("inventruns").value=parseInt(document.getElementById("baseruns").value)+3;
 break;
 case "1.8":
 document.getElementById("me").value=-5;
 document.getElementById("prode").value=-2;
+document.getElementById("inventruns").value=parseInt(document.getElementById("baseruns").value)+4;
 break;
 case "1.9":
 document.getElementById("me").value=-3;
 document.getElementById("prode").value=-5;
+document.getElementById("inventruns").value=parseInt(document.getElementById("baseruns").value)+2;
 break;
 }
 
@@ -842,28 +868,40 @@ $stmt = $dbh->prepare($inventionsql);
 <h1><a href="#" class="jqModal">Invention Material Requirements</a></h1><p><a href="//www.fuzzwork.co.uk/blueprints/inventionxml/<? echo $databasenumber ?>/<? echo $itemid ?>">xml for materials</a></p>
 <label for="inventionchance">Invention chance</label><input type=text id="inventionchance" value="40" onchange='runinventionnumbers()'>%<br>
 <label for="inventprofit">Remove from isk/hr</label><input type=checkbox id="inventprofit" onchange='runinventionnumbers()'><br>
-<label for="inventruns">Runs per invention</label><input type=test id="inventruns" value=10 onchange='runinventionnumbers()'>
+<label for="inventruns">Runs per invention</label><input type=text id="inventruns" value=<? echo $maxruns; ?> disabled><input type=hidden id="baseruns" value=<? echo $maxruns; ?>>
 <table border=1>
-<tr><th>Datacore Name</th><th>Datacore Quantity</th><th>Datacore Cost</th></tr>
+<tr><th>Invention Material Name</th><th>Invention Material Quantity</th><th>Datacore Cost</th></tr>
 <?
 $stmt->execute(array($baseid));
 $chance=0.4;
 while ($row = $stmt->fetchObject()){
-echo "<tr><td>".$row->typename."</td><td id='inventquantity-".$row->typeid."' align=;right'>".$row->quantity."</td><td id='inventcost-".$row->typeid."' align='right'>&nbsp</td></tr>\n";
-$typeid2.=",".$row->typeid;
-$dctype.=",".$row->typeid;
-$chance=$row->chance;
+    echo "<tr><td>".$row->typename."</td><td id='inventquantity-".$row->typeid."' align=;right'>".$row->quantity."</td><td id='inventcost-".$row->typeid."' align='right'>&nbsp</td></tr>\n";
+    $typeid2.=",".$row->typeid;
+    $dctype.=",".$row->typeid;
+    $chance=$row->chance;
 
-if (!isset($chance))
-{
-$chance=0;
+    if (!isset($chance))
+    {
+        $chance=0;
+    }
+
 }
 
+$decryptorsql="select it2.typeid,it2.typename,coalesce(dta2.valueint,dta2.valueFloat) modifier  from invBlueprintTypes ibt join ramTypeRequirements rtr on (ibt.blueprinttypeid=rtr.typeid)join invTypes it1 on (rtr.requiredTypeID=it1.typeid and it1.groupid=716  and activityid=8) join dgmTypeAttributes dta on ( it1.typeid=dta.typeid and dta.attributeid=1115) join invTypes it2 on (it2.groupid=coalesce(dta.valueint,dta.valueFloat)) join dgmTypeAttributes dta2 on (dta2.typeid=it2.typeid and dta2.attributeid=1112) where ibt.producttypeid=?";
+$stmt = $dbh->prepare($decryptorsql);
+$stmt->execute(array($baseid));
+while ($row = $stmt->fetchObject()){
+   echo "<tr class='hidden' id='decryptorrow-".$row->modifier."'><td id='decryptorname-".$row->modifier."'>".$row->typename."</td><td>1</td><td id='decryptorcost-".$row->modifier."' align='right'>&nbsp</td><td class='hidden' id='decryptorid-".$row->modifier."'>$row->typeid</td></tr>\n";
+    $typeid2.=",".$row->typeid;
 }
+
+
+
 $typeid2=trim($typeid2,",");
 $dctype=trim($dctype,",");
 ?>
-<tr><th colspan=2>Datacore cost per Successful invention</th><td id='inventtotalcost' align='right'>&nbsp</td></tr>
+<tr><td id="displaydecryptor">No Decryptor</td><td id="displaydecryptorq">0</td><td id=displaydecryptorc align='right'></td></tr>
+<tr><th colspan=2>Material cost per Successful invention</th><td id='inventtotalcost' align='right'>&nbsp</td></tr>
 
 </table>
 </div>
