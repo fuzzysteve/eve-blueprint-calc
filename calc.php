@@ -151,7 +151,6 @@ if (array_key_exists('pricepos',$_COOKIE))
 <title>BP Costs -<? echo $itemname ?></title>
   <link href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
   <link href="/blueprints/main.css" rel="stylesheet" type="text/css"/>
-  <link href="/blueprints/jqModal.css" rel="stylesheet" type="text/css"/>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
   <link href="//ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css" rel="stylesheet" type="text/css"/>
@@ -159,7 +158,6 @@ if (array_key_exists('pricepos',$_COOKIE))
   <script type="text/javascript" src="/blueprints/dataTables.currencySort.js"></script>
 
   <script src="/blueprints/format.js"></script>
-  <script src="/blueprints/jqModal.js"></script>
 
 <script type="text/javascript">
 
@@ -308,6 +306,7 @@ function runinventionnumbers()
 
        document.getElementById("inventtotalcost").innerHTML=addIskCommas(((Math.round(totalcost/(inventionchance/100))/100))*100);
        inventioncost=totalcost/(inventionchance/100);
+       document.getElementById("inventioncost").innerHTML=addIskCommas(((Math.round((totalcost/(inventionchance/100))/parseInt(document.getElementById("inventruns").value))/100))*100);
     }
     runmenumbers();
 }
@@ -702,7 +701,7 @@ $(document).ready(function() {
     $("input#blueprintname").autocomplete({ source: source });
     runmenumbers();
     runinventionnumbers();
-    $('#inventiondialog').jqm();
+    $('#inventiondialog').dialog({autoOpen: false,width:600});
     calculateresult();
 
     $("td.togglebuy").click( function() {
@@ -732,7 +731,7 @@ $(document).ready(function() {
     padding: 0.2em 0.4em;
     text-decoration: none;
 }
-
+div.jqDrag {cursor: move;}
 .jitaprice {
  display: table-cell;
 }
@@ -793,6 +792,10 @@ $typeid=trim($typeid,",");
 <tr><td colspan=4>Total</td><td id=perfecttotal align=right>&nbsp;</td><td id=basictotal align=right>&nbsp;</td><td id='totaldifference' align=right>&nbsp;</td></tr>
 <tr><td colspan=5>Total with Extra materials</td><td id=overalltotal align=right>&nbsp;</td><td>&nbsp;</td></tr>
 <tr><td colspan=5>Sell Price</td><td id="<? echo $itemid?>-cost" align=right>&nbsp;</td><td id=profit>&nbsp;</td></tr>
+<? if ($metaGroupID==2)
+{?>
+<tr><td colspan=5>Invention Cost Per Unit</td><td colspan=2 id="inventioncost" align=right>&nbsp;</td></tr>
+<?}?>
 </tfoot>
 </table>
 <p>A no waste ME is: <? $nowaste=floor($max*(($wasteFactor/100)/0.5)); echo $nowaste; 
@@ -839,9 +842,9 @@ echo "<tr><td>".$row->tn."</td><td>".$row->qn."</td></tr>\n";
 <label for="prode">Blueprint PE</label><input type=text value=0 id="prode" size=3 style='width:3em;margin-right:1em;margin-left:1em'><div id="prodeslider" style='width:500px;display:inline-block;height:0.5em'></div><br>
 <label for="ind">Manufacturer Industry</label><input type=text value=1 id="ind" readonly=y size=1 style='width:1em;margin-right:1em;margin-left:1em'><div id="indslider" style='width:100px;display:inline-block;height:0.5em'></div><br>
 <table border=1>
-<tr><th>Base time</th><th>Time with PE</th><th>Your time</th><th>Your POS time</th><th>RAA</th><tr>
+<tr><th>Base time</th><th>Time with PE</th><th>Your time</th><th>Your POS time</th><tr>
 <tr><td id=basetime align=right><? echo $productiontime ?></td><td id=petime align=right>&nbsp;</td><td id=youtime align=right>&nbsp;</td><td id=youpostime align=right>&nbsp;</td></tr>
-<tr><th>iskh</th><td id="peiskh" align=right>&nbsp;</td><td id=youriskh align=right>&nbsp;</td><td id=posiskh align=right>&nbsp;</td><td id=raaiskh aligh=right>&nbsp;</tr>
+<tr><th>iskh</th><td id="peiskh" align=right>&nbsp;</td><td id=youriskh align=right>&nbsp;</td><td id=posiskh align=right>&nbsp;</td></tr>
 </table>
 <h2>Material Efficiency Research Time</h2>
 <label for="met">Metallurgy</label><input type=text value=0 id="met" size=3 style='width:3em;margin-right:1em;margin-left:1em'><div id="metslider" style='width:500px;display:inline-block;height:0.5em'></div><br>
@@ -865,7 +868,7 @@ $inventionsql="select invTypes.typeid,invTypes.typename,ramTypeRequirements.quan
 $stmt = $dbh->prepare($inventionsql);
 ?>
 <div id="invention">
-<h1><a href="#" class="jqModal">Invention Material Requirements</a></h1><p><a href="//www.fuzzwork.co.uk/blueprints/inventionxml/<? echo $databasenumber ?>/<? echo $itemid ?>">xml for materials</a></p>
+<h1><span onclick='$("#inventiondialog").dialog( "open" );' style="color: blue;text-decoration: underline;">Invention Calculator</span></h1><p><a href="//www.fuzzwork.co.uk/blueprints/inventionxml/<? echo $databasenumber ?>/<? echo $itemid ?>">xml for materials</a></p>
 <label for="inventionchance">Invention chance</label><input type=text id="inventionchance" value="40" onchange='runinventionnumbers()'>%<br>
 <label for="inventprofit">Remove from isk/hr</label><input type=checkbox id="inventprofit" onchange='runinventionnumbers()'><br>
 <label for="inventruns">Runs per invention</label><input type=text id="inventruns" value=<? echo $maxruns; ?> disabled><input type=hidden id="baseruns" value=<? echo $maxruns; ?>>
@@ -1004,11 +1007,10 @@ staticurl="//www.fuzzwork.co.uk/blueprints/static/<? echo $itemid ?>/";
 <input type=submit value="Do calculations" />
 </form>
 </div>
-<div class="jqmWindow" id="inventiondialog">
-<body>
+<div id="inventiondialog" title="Invention Calculator" class="hidden">
 <form id='calculator' name='calculator'>
 <table>
-<tr><th>Base Chance</th><th>Encryption Skill</th><th>Datacore Skill 1</th><th>Datacore Skill 2</th><th>MetaItem</th><th>Decryptor</th><th>Chance</th></tr>
+<tr><th>Base</th><th>Encryption</th><th>DC 1</th><th>DC 2</th><th>MetaItem</th><th>Decryptor</th><th>Chance</th></tr>
 <tr>
 <td class="slidercell">
 <?
@@ -1059,19 +1061,16 @@ $chance=0;
                 <span class="note">Base chance is 40% for all other inventables</span><br />
         </div>
 <table>
-<tr><th>Decryptor</th><th>Modifier</th><th>Decryptor Effects</th></tr>
-<tr><td>None</td><td>1</td><td>No chance modifier, end copy is ME -4, PE -4 </td></tr>
-<tr><td>Augmentation</td><td>0.6</td><td>Chance is reduced to 60% of what it was. Max runs is raised by 9.  end copy is ME -6, PE -3. Very rarely worth it.</td></tr>
-<tr><td>Optimized Augmentation</td><td>0.9</td><td>Chance is reduced to 90% of what it was. Max runs is raised by 7.  end copy is ME -2, PE -4.</td></tr>
-<tr><td>Symmetry</td><td>1.0</td><td>Chance is unaffected. Max runs is raised by 2.  End copy is ME -3, PE 0.</td>
-</tr>
-<tr><td>Process</td><td>1.1</td><td>Chance is raised to 110% of what it was.  End copy is ME -1, PE -1.</td></tr>
-<tr><td>Accelerant</td><td>1.2</td><td>Chance is raised to 120% of what it was. Max runs is raised by 1.  End copy is ME -2, PE 1.</td>
-<tr><td>Parity</td><td>1.5</td><td>Chance is raised to 150% of what it was. Max Runs is raised by 3. End copy is ME -3, PE -5.</td></tr>
-</tr>
-<tr><td>Attainment</td><td>1.8</td><td>Chance is raised to 180% of what it was. Max runs is raised by 4.  end copy is ME -5, PE -2.</td>
-<tr><td>Optimized Attainment</td><td>1.9</td><td>Chance is raised to 190% of what it was. Max runs is raised by 2.  end copy is ME -3, PE -5.</td>
-</tr>
+<tr><th>Decryptor</th><th>Modifier</th><th>Runs</th><th>Final ME</th><th>Final PE</th></tr>
+<tr><td>None</td><td>1</td><td>+0</td><td>-4</td><td>-4</td></tr>
+<tr><td>Augmentation</td><td>0.6</td><td>+9</td><td>-6</td><td>-3</td></tr>
+<tr><td>Optimized Augmentation</td><td>0.9</td><td>+7<td>-2</td><td>-4</td></tr>
+<tr><td>Symmetry</td><td>1.0</td><td>+2</td><td>-3</td><td>0</td></tr>
+<tr><td>Process</td><td>1.1</td><td>+0</td><td>-1</td><td>-1</td></tr>
+<tr><td>Accelerant</td><td>1.2</td><td>+1</td><td>-2</td><td>1.</td></tr>
+<tr><td>Parity</td><td>1.5</td><td>+3</td><td>-3</td><td>-5</td></tr>
+<tr><td>Attainment</td><td>1.8</td><td>4</td><td>-5</td><td>-2</td></tr>
+<tr><td>Optimized Attainment</td><td>1.9</td><td>+2</td><td>-3</td><td>-5</td></tr>
 </table>
 </div>
 All images are  copyright 2012 CCP hf. All rights reserved. 'EVE', 'EVE Online', 'CCP', and all related logos and images are trademarks or registered trademarks of CCP hf.
