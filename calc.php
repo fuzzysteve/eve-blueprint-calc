@@ -631,6 +631,7 @@ break;
 case "1.1":
 document.getElementById("me").value=-1;
 document.getElementById("prode").value=-1;
+document.getElementById("inventruns").value=document.getElementById("baseruns").value;
 break;
 case "1.2":
 document.getElementById("me").value=-2;
