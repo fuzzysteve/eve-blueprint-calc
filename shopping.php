@@ -1,7 +1,10 @@
 <?php
 
-$memcache = new Memcache;
-$memcache->connect('localhost', 11211) or die ("Could not connect");
+$pricetype='redis';
+#$pricetype='memcache';
+#$pricetype='marketdata';
+
+require_once($pricetype.'price.php');
 
 require_once('db.inc.php');
 $ignoreprice=0;
@@ -378,22 +381,8 @@ while ($row = $stmt->fetchObject())
     }
     else
     {
-        $price = $memcache->get('price-type-'.$row->typeid);
-
-        if ($price)
-        {
+            list($price,$pricebuy)=returnprice($row->typeid);
             echo $price;
-        }
-        else
-        {
-            $url="http://api.eve-marketdata.com/api/item_prices2.xml?char_name=steveronuken&buysell=s&type_ids=".$row->typeid;
-            $pricexml=file_get_contents($url);
-            $xml=new SimpleXMLElement($pricexml);
-            $price= (float) $xml->result->rowset->row['price'][0];
-            $price=round($price,2);
-            $memcache->set('price-type-'.$row->typeid,$price,false,86400);
-            echo $price;
-        }
     }
 
     echo "</td><td class=\"priceedit hidden\"><input style=\"text-align: right;\" type=text id=\"".$row->typeid."-priceedit\" align=right value=\"$price\" onchange=\"updateprice(".$row->typeid.")\" maxlength=10></td></tr>\n";

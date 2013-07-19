@@ -1,7 +1,5 @@
 <?php
 header('Content-Type: text/html');
-$memcache = new Memcache;
-$memcache->connect('localhost', 11211) or die ("Could not connect");
 
 require_once('../db.inc.php');
 

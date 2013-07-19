@@ -1,7 +1,9 @@
 <?php
+$pricetype='redis';
+#$pricetype='memcache';
+#$pricetype='marketdata';
 
-$memcache = new Memcache;
-$memcache->connect('localhost', 11211) or die ("Could not connect");
+require_once($pricetype.'price.php');
 
 require_once('db.inc.php');
 $ignoreprice=0;
@@ -957,23 +959,8 @@ while ($row = $stmt->fetchObject())
     }
     else
     { 
-        $pricedatasell=$memcache->get('forgesell-'.$row->typeid);
-        $pricedatabuy=$memcache->get('forgebuy-'.$row->typeid);
-        $values=explode("|",$pricedatasell);
-        $price=$values[0];
-        if (!(is_numeric($price)))
-        {
-            $price=0;
-        }
-            echo $price;
-        $values=explode("|",$pricedatabuy);
-        $pricebuy=$values[0];
-        if (!(is_numeric($pricebuy)))
-        {
-            $pricebuy=0;
-        }
-
-
+        list($price,$pricebuy)=returnprice($row->typeid);
+        echo $price;
 
     }
 

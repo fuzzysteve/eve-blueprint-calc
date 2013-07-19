@@ -30,7 +30,8 @@ $productiontime=$row->productionTime;
 $productionmodifier=$row->productivityModifier;
 $researchProductivityTime=$row->researchProductivityTime;
 $researchMaterialTime=$row->researchMaterialTime;
-
+$blueprintpe=0;
+$industry=0;
 
 if (array_key_exists('mpe',$_GET) && is_numeric($_GET['mpe']))
 {
@@ -40,12 +41,31 @@ if (array_key_exists('me',$_GET) && is_numeric($_GET['me']))
 {
 $me=$_GET['me'];
 }
+if (array_key_exists('bpe',$_GET) && is_numeric($_GET['bpe']))
+{
+$blueprintpe=$_GET['bpe'];
+}
+if (array_key_exists('industry',$_GET) && is_numeric($_GET['industry']))
+{
+$industry=$_GET['industry'];
+}
 
 echo "<?xml version='1.0' encoding='UTF-8'?>";
+
+if ($blueprintpe<0)
+{
+$time=$productiontime*(1-(($productionmodifier/$productiontime)*($blueprintpe-1)));
+}
+else
+{
+$time=$productiontime*(1-(($productionmodifier/$productiontime)*($blueprintpe/(1+$blueprintpe))));
+}
+
+$time=$time * (1 - (.04 * $industry));
+
 ?>
 
-<blueprint id="<? echo $itemid; ?>" name="<? echo $itemname; ?>" productiontime="<? echo $productiontime; ?>" productionmodifier="<? echo $productionmodifier; ?>" waste="<? echo $wasteFactor;?>" >
-<basematerials>
+<blueprint id="<? echo $itemid; ?>" name="<? echo $itemname; ?>" productiontime="<? echo $productiontime; ?>" productionmodifier="<? echo $productionmodifier; ?>" yourtime="<? echo $time; ?>" >
 <?
 if ($me<0)
 {
@@ -68,7 +88,6 @@ while ($row = $stmt->fetchObject()){
 if ($row->quantity>0)
 {
 $name=$row->name;
-echo '<material name="'.$name.'" id="'.$row->typeid.'" basequantity="'.$row->quantity.'" actualquantity="'.round($row->quantity+($row->quantity*$wasteage)+($row->quantity*(0.25-(0.05*$pe)))).'" condensed="'.$name.';'.$row->typeid.';'.$row->quantity.';'.round($row->quantity+($row->quantity*$wasteage)+($row->quantity*(0.25-(0.05*$pe)))).';1;1;1"/>'."\n";
 $typeid[$row->typeid]=1;
 $typeamount[$row->typeid]=$row->quantity;
 $typeactual[$row->typeid]=round($row->quantity+($row->quantity*$wasteage)+($row->quantity*(0.25-(0.05*$pe))));
@@ -76,8 +95,6 @@ $typename[$row->typeid]=$name;
 }
 }
 ?>
-</basematerials>
-<extramaterials>
 <?
 $typeide="";
 $typeid2=$typeid;
@@ -101,15 +118,13 @@ $typename[$row->typeid]=$name;
 $typeid[$row->typeid]=1;
 }
 
-echo '<material name="'.$name.'" id="'.$row->typeid.'" quantity="'.$row->qn.'" damage="'.$row->dmg.'" actualquantity="'.$actual.'" recyclable="'.$row->recycle.'" condensed="'.$name.';'.$row->typeid.';'.$row->qn.';'.$actual.';'.$row->dmg.';'.$row->recycle.';0" />'."\n";
 }
 
-echo "</extramaterials>\n";
 
 echo "<totalmaterials>\n";
 foreach ($typeid as $key=>$vaule)
 {
-echo '<material name="'.$typename[$key].'" id="'.$key.'" quantity="'.$typeamount[$key].'" actualquantity="'.$typeactual[$key].'" condensed="'.$typename[$key].';'.$key.';'.$typeamount[$key].';'.$typeactual[$key].'"/>'."\n";
+echo '<'.str_replace(" ","_",$typename[$key]).' id="'.$key.'">'.$typeactual[$key].'</'.str_replace(" ","_",$typename[$key]).">\n";
 }
 echo "</totalmaterials>\n";
 echo "</blueprint>";
