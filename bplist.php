@@ -32,7 +32,7 @@ $inventory=array();
 foreach ($entries as $entry)
 {
    $entry=str_replace(",","",$entry);
-   if (preg_match("/^(.+?)\t(\d+?)?\t(.+?)\tBlueprint\t(Yes|No)\t(\d+?)\t(\d+?)\t?(\d+?)?$/",trim($entry),$matches))
+   if (preg_match("/^(.+?)\t(\d+?)?\t(.+?)\tBlueprint\t(Yes|No)\t(\-?\d+?)\t(\-?\d+?)\t?(\d+?)?$/",trim($entry),$matches))
    {
        if(isset($typeidlookup[$matches[1]]))
        {
@@ -42,13 +42,13 @@ foreach ($entries as $entry)
                $quantity=$matches[2];
            }
 
-           if(isset($inventory[$typeidlookup[$matches[1]]."-".$matches[4].":".$matches[7]."-".$matches[5]."-".$matches[6]]))
+           if(isset($inventory[$typeidlookup[$matches[1]]."/".$matches[4].":".$matches[7]."/".$matches[5]."/".$matches[6]]))
            {
-               $inventory[$typeidlookup[$matches[1]]."-".$matches[4].":".$matches[7]."-".$matches[5]."-".$matches[6]]+=$quantity;
+               $inventory[$typeidlookup[$matches[1]]."/".$matches[4].":".$matches[7]."/".$matches[5]."/".$matches[6]]+=$quantity;
            }
            else
            {
-               $inventory[$typeidlookup[$matches[1]]."-".$matches[4].":".$matches[7]."-".$matches[5]."-".$matches[6]]=$quantity;
+               $inventory[$typeidlookup[$matches[1]]."/".$matches[4].":".$matches[7]."/".$matches[5]."/".$matches[6]]=$quantity;
            }
        }
     }
@@ -97,7 +97,7 @@ $(document).ready(function()
 
 
 foreach (array_keys($inventory) as $blueprint ){
-list($typeid,$copy,$me,$pe)=explode("-",$blueprint);
+list($typeid,$copy,$me,$pe)=explode("/",$blueprint);
 echo "<tr><td>".$typeid."</td><td><a href=\"//www.fuzzwork.co.uk/blueprints/".$productlookup[$typeid]."/$me/$pe\" target='_blank'>".$typenamelookup[$typeid]."</a></td><td>".$inventory[$blueprint]."</td><td>$me</td><td>$pe</td><td>$copy</td></tr>";
 }
 
