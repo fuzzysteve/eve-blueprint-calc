@@ -40,7 +40,7 @@ $inventory=array();
 foreach ($entries as $entry)
 {
    $entry=str_replace(",","",$entry);
-   if (preg_match("/^(.+?)\t(\d+?)?\t(.+?)\tBlueprint\t(Yes|No)\t(\-?\d+?)\t(\-?\d+?)\t?(\d+?)?$/",trim($entry),$matches))
+   if (preg_match("/^(.+?)\t(\d+?)?\t(.+?)\tBlueprint\t(Yes|No)\t(\-?\d+?)\t(\-?\d+?)\t(\d+?)$/",trim($entry),$matches))
    {
        if(isset($typeidlookup[$matches[1]]))
        {
@@ -59,7 +59,28 @@ foreach ($entries as $entry)
                $inventory[$typeidlookup[$matches[1]]."/".$matches[4].":".$matches[7]."/".$matches[5]."/".$matches[6]]=$quantity;
            }
        }
+    } else
+   if (preg_match("/^(.+?)\t(\d+?)?\t(.+?)\tBlueprint\t(Yes|No)\t(\-?\d+?)\t(\-?\d+?)$/",trim($entry),$matches))
+   {
+       if(isset($typeidlookup[$matches[1]]))
+       {
+           $quantity=1;
+           if (is_numeric($matches[2]))
+           {
+               $quantity=$matches[2];
+           }
+
+           if(isset($inventory[$typeidlookup[$matches[1]]."/".$matches[4].":/".$matches[5]."/".$matches[6]]))
+           {
+               $inventory[$typeidlookup[$matches[1]]."/".$matches[4].":/".$matches[5]."/".$matches[6]]+=$quantity;
+           }
+           else
+           {
+               $inventory[$typeidlookup[$matches[1]]."/".$matches[4].":/".$matches[5]."/".$matches[6]]=$quantity;
+           }
+       }
     }
+
 
 }
 
