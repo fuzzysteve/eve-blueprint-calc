@@ -2,6 +2,14 @@
 require_once('db.inc.php');
 
 
+$pricetype='redis';
+require_once($pricetype.'price.php');
+
+if (array_key_exists('mpe',$_COOKIE) && is_numeric($_COOKIE['mpe']))
+{
+$mpe=$_COOKIE['mpe'];
+}
+
 
 if (array_key_exists('entries',$_POST))
 {
@@ -90,15 +98,33 @@ $(document).ready(function()
 <body>
 <table border=1 id="blueprints" class="tablesorter">
 <thead>
-<tr><th>id</th><th>Name</th><th>Quantity</th><th>ME</th><th>PE</th><th>Copy?</th></tr>
+<tr><th>id</th><th>Name</th><th>Quantity</th><th>ME</th><th>PE</th><th>Copy?</th><th>Margin(ish)</th></tr>
 </thead>
 <tbody>
 <?
 
+$pricesql="select sum(quantity*price) `totalprice` from (select typeid,name,round(sum(quantity)+(sum(perfect)*(0.25-(0.05*:pe))*max(base))) quantity from( select typeid,name,round(if(:me>=0,greatest(0,sum(quantity))+(greatest(0,sum(quantity))*((wastefactor/(:me+1))/100)),greatest(0,sum(quantity))+(greatest(0,sum(quantity))*(wastefactor/100)*(1-:me)))) quantity,1 base,greatest(0,sum(quantity)) perfect from (   select invTypes.typeid typeid,invTypes.typeName name,quantity   from invTypes,invTypeMaterials   where invTypeMaterials.materialTypeID=invTypes.typeID    and invTypeMaterials.TypeID=:typeid   union   select invTypes.typeid typeid,invTypes.typeName name,          invTypeMaterials.quantity*r.quantity*-1 quantity   from invTypes,invTypeMaterials,ramTypeRequirements r,invBlueprintTypes bt   where invTypeMaterials.materialTypeID=invTypes.typeID    and invTypeMaterials.TypeID =r.requiredTypeID    and r.typeID = bt.blueprintTypeID    and r.activityID = 1 and bt.productTypeID=:typeid and r.recycle=1 ) t join invBlueprintTypes on (invBlueprintTypes.productTypeID=:typeid) group by typeid,name union SELECT t.typeID typeid,t.typeName tn, r.quantity * r.damagePerJob quantity,0 base,r.quantity * r.damagePerJob perfect FROM ramTypeRequirements r,invTypes t,invBlueprintTypes bt,invGroups g where r.requiredTypeID = t.typeID and r.typeID = bt.blueprintTypeID and r.activityID = 1 and bt.productTypeID=:typeid and g.categoryID != 16 and t.groupID = g.groupID) outside group by typeid,name) bom join evesupport.sellprices on (bom.typeid=sellprices.typeid) where region=10000002";
+$pricestmt = $dbh->prepare($pricesql);
+$detailsql="select portionSize from invTypes where typeid=:typeid";
+$detailstmt = $dbh->prepare($detailsql);
 
 foreach (array_keys($inventory) as $blueprint ){
 list($typeid,$copy,$me,$pe)=explode("/",$blueprint);
-echo "<tr><td>".$typeid."</td><td><a href=\"//www.fuzzwork.co.uk/blueprints/".$productlookup[$typeid]."/$me/$pe\" target='_blank'>".$typenamelookup[$typeid]."</a></td><td>".$inventory[$blueprint]."</td><td>$me</td><td>$pe</td><td>$copy</td></tr>";
+
+
+$pricestmt->execute(array(":typeid"=>$productlookup[$typeid],":me"=>$me,":pe"=>$mpe));
+$detailstmt->execute(array(":typeid"=>$productlookup[$typeid]));
+$pricerow = $pricestmt->fetchObject();
+$detailrow = $detailstmt->fetchObject();
+list($itemprice,$itempricebuy)=returnprice($productlookup[$typeid]);
+
+
+echo "<tr><td>".$typeid."</td><td><a href=\"//www.fuzzwork.co.uk/blueprints/".$productlookup[$typeid]."/$me/$pe\" target='_blank'>".$typenamelookup[$typeid]."</a></td><td>".$inventory[$blueprint]."</td><td>$me</td><td>$pe</td><td>$copy</td><td>\n";
+
+
+echo ($detailrow->portionSize*$itemprice)-($pricerow->totalprice);
+
+echo "</td></tr>\n";
 }
 
 
