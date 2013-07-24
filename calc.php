@@ -434,6 +434,7 @@ function setme(menumber)
 }
 
 </script>
+<script type="text/javascript" src="/blueprints/items.php"></script>
 <script type="text/javascript">
 waste=<? echo $wasteFactor; ?>;
 
@@ -664,23 +665,6 @@ document.getElementById("inventionchance").value=Math.floor(InventionChance*100)
 runinventionnumbers();
 }
 
-
-<?
-
-$sql="select typename from $database.invBlueprintTypes,$database.invTypes where typeid=productTypeID and invTypes.published=1 order by typename";
-
-$stmt = $dbh->prepare($sql);
-
-$stmt->execute();
-
-echo "source=[";
-$row = $stmt->fetchObject();
-echo  '"'.$row->typename.'"';
-while ($row = $stmt->fetchObject()){
-echo ',"'.$row->typename.'"';
-}
-echo "];\n";
-?>
 
 $(document).ready(function() {
 

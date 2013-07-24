@@ -9,24 +9,8 @@ require_once('db.inc.php');
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
   
+<script src="/blueprints/items.php"></script>
 <script>
-<?
-
-$sql='select typename from invBlueprintTypes,invTypes where typeid=productTypeID and invTypes.published=1 order by typename';
-
-$stmt = $dbh->prepare($sql);
-
-$stmt->execute();
-
-echo "source=[";
-$row = $stmt->fetchObject();
-echo  '"'.$row->typename.'"';
-while ($row = $stmt->fetchObject()){
-echo ',"'.$row->typename.'"';
-}
-echo "];\n";
-?>
-
 $(document).ready(function() {
     $("input#blueprintname").autocomplete({ source: source });
 });
@@ -68,6 +52,8 @@ echo "<option value='".$row->id."'>".$row->name."</option>";
 
 <input type=submit value="Do calculations" />
 </form>
+<br><br>
+<a href="/blueprints/enterlist.php">Form based Entry</a> - Cut and paste a list from your S&amp;I screen, to have links generated for you.<br>
 <?
 
 if (array_key_exists('blueprints',$_COOKIE))
@@ -89,6 +75,7 @@ if (array_key_exists('blueprints',$_COOKIE))
     $stmt = $dbh->prepare($sql);
 
     $stmt->execute();
+
     echo "<h2>Saved Blueprints</h2>\n";
 $marketgroupid=0;
     while ($row = $stmt->fetchObject()){
