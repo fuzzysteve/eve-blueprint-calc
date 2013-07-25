@@ -9,7 +9,7 @@
 </head>
 <body>
 <p>Paste in a copy and paste from your blueprint list on the S&I interface, and get a page of links to the blueprint details. No details of your blueprints are stored on the server, so you'll have to do this each time you want to see them. The list will be condensed to a count</p>
-
+<p>To get the list in a useful fashion, open the S&amp;I interface and go to the blueprints tab. open the relevant grey heading. Then double click it. you'll get a window you can C&amp;P from </p>
 <form method=post action='bplist.php'>
 <textarea id="entries" name='entries' rows=20 cols=60/>
 </textarea><br />

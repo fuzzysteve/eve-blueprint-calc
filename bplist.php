@@ -107,9 +107,6 @@ foreach ($entries as $entry)
 $(document).ready(function()
     {
         var oTable = $("#blueprints").dataTable({
-           "bPaginate": false,
-            "bFilter": false,
-            "bInfo": false,
             "bAutoWidth": false,
 });
     }
@@ -156,7 +153,7 @@ echo "</td></tr>\n";
 <tfoot>
 </tfoot>
 </table>
-
+<br/>
 <?php include('/home/web/fuzzwork/analytics.php'); ?>
 
 </body>

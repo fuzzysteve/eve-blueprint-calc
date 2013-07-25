@@ -142,7 +142,7 @@ if (array_key_exists('pricepos',$_COOKIE))
     $pwidth=substr($coords[0]['width'],0,-2);
     if (is_numeric($top)&& is_numeric($left)&& is_numeric($pwidth))
     {
-        $pricepos="left:".$left."px;top:".$top."px;width:".$pwidth."px;";
+        $pricepos="left:".$left."px;top:".$top."px;";
     }
 }
 
@@ -158,6 +158,7 @@ if (array_key_exists('pricepos',$_COOKIE))
   <link href="//ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css" rel="stylesheet" type="text/css"/>
   <script type="text/javascript" src="//ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
   <script type="text/javascript" src="/blueprints/dataTables.currencySort.js"></script>
+  <script type="text/javascript" src="/blueprints/ColVis.min.js"></script>
 
   <script src="/blueprints/format.js"></script>
 
@@ -185,15 +186,15 @@ function runmenumbers()
     {
         perfect=parseInt(document.getElementById(typeid[type] + "-perfect").innerHTML);
         document.getElementById(typeid[type] + "-bp").innerHTML=addCommas(Math.round(perfect+(perfect*wasteage)));
-        basematerials.fnUpdate(addCommas(Math.round(perfect+(perfect*wasteage))),document.getElementById("basemat-"+typeid[type]),2);
+        basematerials.fnUpdate(addCommas(Math.round(perfect+(perfect*wasteage))),document.getElementById("basemat-"+typeid[type]),2,0);
         document.getElementById(typeid[type] + "-you").innerHTML=addCommas(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe)))));
-        basematerials.fnUpdate(addCommas(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe))))),document.getElementById("basemat-"+typeid[type]),3);
+        basematerials.fnUpdate(addCommas(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe))))),document.getElementById("basemat-"+typeid[type]),3,0);
         document.getElementById(typeid[type] + "-cost").innerHTML=addIskCommas(Math.round(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe))))*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100);
-        basematerials.fnUpdate(addIskCommas(Math.round(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe))))*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100),document.getElementById("basemat-"+typeid[type]),5);
+        basematerials.fnUpdate(addIskCommas(Math.round(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe))))*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100),document.getElementById("basemat-"+typeid[type]),5,0);
         document.getElementById(typeid[type] + "-perfectcost").innerHTML=addIskCommas(Math.round(perfect*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100);
-         basematerials.fnUpdate(addIskCommas(Math.round(perfect*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100),document.getElementById("basemat-"+typeid[type]),4);
+         basematerials.fnUpdate(addIskCommas(Math.round(perfect*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100),document.getElementById("basemat-"+typeid[type]),4,0);
         document.getElementById(typeid[type] + "-diff").innerHTML=addCommas(Math.round(((Math.round(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe))))*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100)-(Math.round(perfect*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100))*100)/100);
-        basematerials.fnUpdate(addCommas(Math.round(((Math.round(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe))))*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100)-(Math.round(perfect*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100))*100)/100),document.getElementById("basemat-"+typeid[type]),6); 
+        basematerials.fnUpdate(addCommas(Math.round(((Math.round(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe))))*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100)-(Math.round(perfect*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100))*100)/100),document.getElementById("basemat-"+typeid[type]),6,0); 
         total=total+Math.round(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe))))*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100;
         perfecttotal=perfecttotal+Math.round(perfect*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100;
         if (me>=Math.floor(perfect*((waste/100)/0.5)))
@@ -205,6 +206,7 @@ function runmenumbers()
            $("#"+typeid[type]+"-me").toggleClass('perfect',false);
         }
     }
+     basematerials.fnDraw();
 
     for (type in typeide)
     {
@@ -214,12 +216,12 @@ function runmenumbers()
             number=(number+(number*(0.25-(0.05*pe))));
         }
         document.getElementById(typeide[type] + "-extranum").innerHTML=addCommas(Math.round(number));
-        extramaterials.fnUpdate(addCommas(Math.round(number)),document.getElementById("extramat-"+typeide[type]),2);
+        extramaterials.fnUpdate(addCommas(Math.round(number)),document.getElementById("extramat-"+typeide[type]),2,0);
         document.getElementById(typeide[type] + "-extracost").innerHTML=addIskCommas(Math.round((number*document.getElementById(typeide[type] + "-extradam").innerHTML*document.getElementById(typeide[type] + "-jitaprice").innerHTML)*100)/100);
-        extramaterials.fnUpdate(addIskCommas(Math.round((number*document.getElementById(typeide[type] + "-extradam").innerHTML*document.getElementById(typeide[type] + "-jitaprice").innerHTML)*100)/100),document.getElementById("extramat-"+typeide[type]),4);
+        extramaterials.fnUpdate(addIskCommas(Math.round((number*document.getElementById(typeide[type] + "-extradam").innerHTML*document.getElementById(typeide[type] + "-jitaprice").innerHTML)*100)/100),document.getElementById("extramat-"+typeide[type]),4,0);
         etotal=etotal+Math.round((number*document.getElementById(typeide[type] + "-extradam").innerHTML*document.getElementById(typeide[type] + "-jitaprice").innerHTML)*100)/100;
     }
-
+    extramaterials.fnDraw();
     document.getElementById("<? echo $itemid;?>-cost").innerHTML=addIskCommas(Math.round(parseFloat(document.getElementById("<? echo $itemid;?>-jitaprice").innerHTML)*<? echo $portionsize;?>*100)/100);;
     document.getElementById("etotal").innerHTML=addIskCommas(Math.round(etotal*100)/100);
     document.getElementById("basictotal").innerHTML=addIskCommas(Math.round(total*100)/100);
@@ -345,6 +347,12 @@ function updateprice(type)
 {
     document.getElementById(type+"-jitaprice").innerHTML=parseFloat(document.getElementById(type+"-priceedit").value);
     runmenumbers();
+}
+
+function updateprices(data)
+{
+   $("#pricetable").html(data);
+   runmenumbers();
 }
 
 function saveprice()
@@ -524,19 +532,13 @@ $(function() {
 
 
 	$(function() {
-		$( "#prices" ).draggable().mouseup(function(){  
+		$( "#prices" ).draggable({ handle: "#priceheader" }).mouseup(function(){  
                     var coords=[];  
                     var coord = $(this).position();  
                     var item={ coordTop:  Math.floor(coord.top), coordLeft: Math.floor(coord.left),width: $("#prices").css('width') };  
                     coords.push(item);
                     createCookie("pricepos",JSON.stringify(coords),700);
-                 }).resizable({stop: function(){
-                    var coords=[];
-                    var coord = $(this).position();
-                    var item={ coordTop:  Math.floor(coord.top), coordLeft: Math.floor(coord.left),width: $("#prices").css('width') };
-                    coords.push(item);
-                    createCookie("pricepos",JSON.stringify(coords),700);
-                 }});
+                 });
 	});
 $(function() {
                 $( "#slider-encryption" ).slider({
@@ -674,14 +676,19 @@ $(document).ready(function() {
             "bFilter": false,
             "bInfo": false,
             "bAutoWidth": false,
-            "aoColumns":[null,null,{ "sType": "currency" },{ "sType": "currency" },{ "sType": "currency" },{ "sType": "currency" },{ "sType": "currency" },null]
+            "bSortClasses": false,
+            "bDeferRender": false,
+            "aoColumns":[null,null,{ "sType": "currency" },{ "sType": "currency" },{ "sType": "currency" },{ "sType": "currency" },{ "sType": "currency" },null],
+            "sDom": 'C<"clear">lfrtip'
     });
     extramaterials=$("#extramaterials").dataTable({
             "bPaginate": false,
             "bFilter": false,
             "bInfo": false,
             "bAutoWidth": false,
-            "aoColumns":[null,null,null,null,{ "sType": "currency" }]
+            "bSortClasses": false,
+            "bDeferRender": false,
+            "aoColumns":[null,null,null,null,{ "sType": "currency" }],
     });
 
 
@@ -708,6 +715,22 @@ $(document).ready(function() {
         runmenumbers();
    });
 
+   showprices=readCookie("showprices");
+   if (!showprices)
+   {
+      showprices=1;
+   }
+
+   $("#togglepricedetail").click(function(){twidth=$("#prices").css('width');$("div#pricedetail").toggle();$("div#prices").css({'height': 'auto','width':twidth});showprices=showprices*-1;createCookie("showprices",showprices,700)});
+   
+   if (showprices==-1)
+   {
+       twidth=$("#prices").css('width');
+       $("div#pricedetail").toggle();
+       $("div#prices").css({'height': 'auto','width':twidth});
+   }
+  
+ 
 });
 </script>
 
@@ -904,9 +927,33 @@ echo "<script>noinvent=1;</script>";
 }
 ?>
 
-<div id="prices" style="width:50%;position:absolute;<? echo $pricepos;?>">
-<h2>Prices</h2>
-<p>You can drag this bit up, if you have the screen width for it</p>
+<div id="prices" style="position:absolute;<? echo $pricepos;?>">
+    <div id="priceheader" class="ui-widget-header"><span id="togglepricedetail" style="float:right"><img src="/blueprints/collapse.png"></span>Prices</div>
+    <div id="pricedetail">
+        <div>
+            <select id="priceregion" onchange='$.post("/blueprints/loadregion.php",{"region":$("#priceregion").val(),"items":typetotal.join(":")},function(data) {updateprices(data);});'>
+<?
+$regionsql='select regionid,regionname from eve.mapRegions  where regionname not like "%-%" order by regionname';
+
+$regionstmt = $dbh->prepare($regionsql);
+
+$regionstmt->execute();
+
+while ($row = $regionstmt->fetchObject()){
+echo "<option value=".$row->regionid;
+if ($row->regionid==10000002)
+{
+echo " selected";
+}
+echo ">".$row->regionname.'</option>';
+}
+?>
+
+
+</select>
+
+       </div>
+       <div id="pricetable">
 <table border=1>
 <?
 if (array_key_exists("prices",$_COOKIE))
@@ -957,6 +1004,8 @@ echo "</td><td class=\"priceedit hidden\"><input style=\"text-align: right;\" ty
 <a name='editprice' onclick="toggleprice()">Edit prices</a>
 <a name='saveprice' onclick="saveprice()" class="priceedit hidden">|save prices</a>
 <a href="" id="clearprice" class="priceedit hidden">|reset prices</a>
+        </div>
+</div>
 </div>
 
 <script type="text/javascript">
