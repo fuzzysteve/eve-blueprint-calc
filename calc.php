@@ -353,6 +353,23 @@ function updateprices(data)
 {
    $("#pricetable").html(data);
    runmenumbers();
+    $("td.togglebuy").click( function() {
+        buy=parseFloat($(this).parents("tr").children(".jitabuy")[0].innerHTML);
+        sell=parseFloat($(this).parents("tr").children(".jitasell")[0].innerHTML);
+        current=parseFloat($(this).parents("tr").children(".jitaprice")[0].innerHTML);
+        if (sell==current)
+        {
+            $(this).parents("tr").children(".jitaprice")[0].innerHTML=buy;
+            $(this)[0].innerHTML='B';
+        }
+        else if (buy==current)
+        {
+            $(this).parents("tr").children(".jitaprice")[0].innerHTML=sell;
+            $(this)[0].innerHTML='S';
+        }
+        runmenumbers();
+   });
+
 }
 
 function saveprice()
