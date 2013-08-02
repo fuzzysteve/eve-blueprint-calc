@@ -459,7 +459,7 @@ function setme(menumber)
 }
 
 </script>
-<script type="text/javascript" src="/blueprints/items.php"></script>
+<script type="text/javascript" src="/blueprints/items.js"></script>
 <script type="text/javascript">
 waste=<? echo $wasteFactor; ?>;
 
@@ -779,9 +779,11 @@ text-decoration:underline;
 .dataTable { width:auto !important; clear:none !important; margin:0 !important;}
 
 </style>
-
+<?php include('/home/web/fuzzwork/htdocs/menu/menuhead.php'); ?>
 </head>
 <body>
+<?php include('/home/web/fuzzwork/htdocs/menu/menu.php'); ?>
+
 <div class="main">
 <h1 class="title"><? if (array_key_exists("HTTP_EVE_TRUSTED",$_SERVER)) { echo "<a name='Main Item' onclick=\"CCPEVE.showMarketDetails(".$itemid.")\" class=\"marketlink\">$itemname <img src='//image.eveonline.com/InventoryType/".$itemid."_64.png' class='icon64'></a>";} else { echo $itemname." <img src='//image.eveonline.com/InventoryType/".$itemid."_64.png' class='icon64'>";}?></h1>
 <p>Things should now be working right for extra materials and how waste is applied there. Thanks go to <a href="https://gate.eveonline.com/Profile/Lutz%20Major">Lutz Major</a>, and other people from the forum.</p>
@@ -1042,6 +1044,8 @@ staticurl="//www.fuzzwork.co.uk/blueprints/static/<? echo $itemid ?>/";
 <form method=post action='/blueprints/calc.php' id="nextsearch">
 <input type=text width=30 id="blueprintname" name='blueprintname' />
 <input type=hidden name="database" value="<? echo $databasenumber ?>">
+<label for="newwindow">New Window?</label>
+<input type=checkbox id=newwindow value="1" onchange="if ($('#newwindow').is(':checked')){ document.getElementById('nextsearch').target='_blank';} else {  document.getElementById('nextsearch').target='_self';}">
 <input type=submit value="Do calculations" />
 </form>
 </div>

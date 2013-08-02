@@ -9,7 +9,7 @@ require_once('db.inc.php');
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
   
-<script src="/blueprints/items.php"></script>
+<script src="/blueprints/items.js"></script>
 <script>
 $(document).ready(function() {
     $("input#blueprintname").autocomplete({ source: source });
@@ -24,8 +24,11 @@ $(document).ready(function() {
     text-decoration: none;
 }
 </style>
+<?php include('/home/web/fuzzwork/htdocs/menu/menuhead.php'); ?>
 </head>
 <body>
+<?php include('/home/web/fuzzwork/htdocs/menu/menu.php'); ?>
+<br>
 <?
 if (array_key_exists('error',$_GET))
 {
