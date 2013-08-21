@@ -106,10 +106,10 @@ foreach ($entries as $entry)
 <html>
 <head>
 <title>Blueprint List</title>
-  <link href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+  <link href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
   <link href="//ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css" rel="stylesheet" type="text/css"/>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
   <script type="text/javascript" src="//ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
 <script>
 $(document).ready(function()
@@ -120,11 +120,13 @@ $(document).ready(function()
     }
 );
 </script>
-<?php include('/home/web/fuzzwork/htdocs/menu/menuhead.php'); ?>
+
+
+<?php include('/home/web/fuzzwork/htdocs/bootstrap/header.php'); ?>
 </head>
 <body>
-<?php include('/home/web/fuzzwork/htdocs/menu/menu.php'); ?>
-<br>
+<?php include('/home/web/fuzzwork/htdocs/menu/menubootstrap.php'); ?>
+<div class="container">
 
 
 <p>Prices are purely indicative, updating once per hour. Costs for invention currently assume skills at 3, with no meta item. Prices of Tech 2 items will be a little off due to R.A.M. modules not being properly consumed (fractions are being rounded down to nothing)</p>
@@ -218,8 +220,12 @@ echo "</td></tr>\n";
 <tfoot>
 </tfoot>
 </table>
-<br/>
-<?php include('/home/web/fuzzwork/analytics.php'); ?>
+
+
+</div>
+<?php include('/home/web/fuzzwork/htdocs/bootstrap/footer.php'); ?>
+
+
 
 </body>
 </html>

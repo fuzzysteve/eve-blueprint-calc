@@ -151,10 +151,10 @@ if (array_key_exists('pricepos',$_COOKIE))
 <html>
 <head>
 <title>BP Costs -<? echo $itemname ?></title>
-  <link href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+  <link href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.24/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
   <link href="/blueprints/main.css" rel="stylesheet" type="text/css"/>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.24/jquery-ui.min.js"></script>
   <link href="//ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css" rel="stylesheet" type="text/css"/>
   <script type="text/javascript" src="//ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
   <script type="text/javascript" src="/blueprints/dataTables.currencySort.js"></script>
@@ -261,12 +261,12 @@ function runpenumbers()
         {
             pmargin2=pmargin;
         }
+        runs=document.getElementById("inventruns").value;
     }
     else
     {
         pmargin2=pmargin;
     }
-
     document.getElementById("petime").innerHTML=rectime(Math.floor(timewaste));
     document.getElementById("youtime").innerHTML=rectime(Math.floor(timewaste* (1 - .04 *parseInt(document.getElementById("ind").value))));
     document.getElementById("youpostime").innerHTML=rectime(Math.floor((timewaste* (1 - .04 *parseInt(document.getElementById("ind").value)))*0.75));
@@ -277,6 +277,13 @@ function runpenumbers()
     document.getElementById("peiskh").innerHTML=addIskCommas(Math.round(((3600/timewaste)*pmargin2)*100)/100);
     document.getElementById("youriskh").innerHTML=addIskCommas(Math.round(((3600/(timewaste* (1 - .04 *parseInt(document.getElementById("ind").value))))*pmargin2)*100)/100);
     document.getElementById("posiskh").innerHTML=addIskCommas(Math.round(((3600/((timewaste* (1 - .04 *parseInt(document.getElementById("ind").value)))*0.75))*pmargin2)*100)/100);
+
+    if (!noinvent)
+    {
+        document.getElementById("peisk24h").innerHTML=addIskCommas(Math.round((((pmargin2*runs)/(Math.floor((timewaste*runs)/86400)+1))/24)*100)/100);
+        document.getElementById("yourisk24h").innerHTML=addIskCommas(Math.round((((pmargin2*runs)/(Math.floor((timewaste*(1 - .04 *parseInt(document.getElementById("ind").value))*runs)/86400)+1))/24)*100)/100);
+        document.getElementById("posisk24h").innerHTML=addIskCommas(Math.round((((pmargin2*runs)/(Math.floor(((timewaste*(1 - .04 *parseInt(document.getElementById("ind").value))*.75)*runs)/86400)+1))/24)*100)/100);
+    }
     updatelink();
 }
 
@@ -612,8 +619,9 @@ $(function() {
                         }
                 });
                 $( "#metaitem" ).val( $( "#slider-metaitem" ).slider( "value" ) );
-        });
 
+
+        });
 function calculateresult()
 {
 if (noinvent)
@@ -779,11 +787,12 @@ text-decoration:underline;
 .dataTable { width:auto !important; clear:none !important; margin:0 !important;}
 
 </style>
-<?php include('/home/web/fuzzwork/htdocs/menu/menuhead.php'); ?>
+
+<?php include('/home/web/fuzzwork/htdocs/bootstrap/header.php'); ?>
 </head>
 <body>
-<?php include('/home/web/fuzzwork/htdocs/menu/menu.php'); ?>
-
+<?php include('/home/web/fuzzwork/htdocs/menu/menubootstrap.php'); ?>
+<div class="container">
 <div class="main">
 <h1 class="title"><? if (array_key_exists("HTTP_EVE_TRUSTED",$_SERVER)) { echo "<a name='Main Item' onclick=\"CCPEVE.showMarketDetails(".$itemid.")\" class=\"marketlink\">$itemname <img src='//image.eveonline.com/InventoryType/".$itemid."_64.png' class='icon64'></a>";} else { echo $itemname." <img src='//image.eveonline.com/InventoryType/".$itemid."_64.png' class='icon64'>";}?></h1>
 <p>Things should now be working right for extra materials and how waste is applied there. Thanks go to <a href="https://gate.eveonline.com/Profile/Lutz%20Major">Lutz Major</a>, and other people from the forum.</p>
@@ -871,9 +880,12 @@ echo "<tr><td>".$row->tn."</td><td>".$row->qn."</td></tr>\n";
 <label for="prode">Blueprint PE</label><input type=text value=0 id="prode" size=3 style='width:3em;margin-right:1em;margin-left:1em'><div id="prodeslider" style='width:500px;display:inline-block;height:0.5em'></div><br>
 <label for="ind">Manufacturer Industry</label><input type=text value=1 id="ind" readonly=y size=1 style='width:1em;margin-right:1em;margin-left:1em'><div id="indslider" style='width:100px;display:inline-block;height:0.5em'></div><br>
 <table border=1>
-<tr><th>Base time</th><th>Time with PE</th><th>Your time</th><th>Your POS time</th><tr>
+<tr><th>Base time</th><th>Time with PE</th><th>Your time</th><th title="POS assembly arrays get a time multiplier of 0.75.">Your POS time</th><tr>
 <tr><td id=basetime align=right><? echo $productiontime ?></td><td id=petime align=right>&nbsp;</td><td id=youtime align=right>&nbsp;</td><td id=youpostime align=right>&nbsp;</td></tr>
 <tr><th>iskh</th><td id="peiskh" align=right>&nbsp;</td><td id=youriskh align=right>&nbsp;</td><td id=posiskh align=right>&nbsp;</td></tr>
+<?php if ($metaGroupID==2){
+echo '<tr title="The ISK/hr assuming you only put jobs in once a day. 3 hours =24 hours. 10 hours =24 hours. 25 hours=48 hours"><th>iskh 24H rounding</th><td id="peisk24h" align=right>&nbsp;</td><td id=yourisk24h align=right>&nbsp;</td><td id=posisk24h align=right>&nbsp;</td></tr>';
+}?>
 </table>
 <h2>Material Efficiency Research Time</h2>
 <label for="met">Metallurgy</label><input type=text value=0 id="met" size=3 style='width:3em;margin-right:1em;margin-left:1em'><div id="metslider" style='width:500px;display:inline-block;height:0.5em'></div><br>
@@ -950,7 +962,7 @@ echo "<script>noinvent=1;</script>";
     <div id="priceheader" class="ui-widget-header"><span id="togglepricedetail" style="float:right"><img src="/blueprints/collapse.png"></span>Prices</div>
     <div id="pricedetail">
         <div>
-            <select id="priceregion" onchange='$.post("/blueprints/loadregion.php",{"region":$("#priceregion").val(),"items":typetotal.join(":")},function(data) {updateprices(data);});'>
+            <select id="priceregion" onchange='$.post("/blueprints/loadregion.php",{"region":$("#priceregion").val(),"items":allitems.join(":")},function(data) {updateprices(data);});'>
 <?
 $regionsql='select regionid,regionname from eve.mapRegions  where regionname not like "%-%" order by regionname';
 
@@ -1032,6 +1044,7 @@ typeid=[<? echo $typeid?>];
 dctypes=[<? echo $dctype?>];
 typeide=[<? echo $typeide?>];
 typetotal=[<? echo trim(trim($typeide.",".$typeid,",").",".$itemid,",")?>];
+allitems=[<? echo trim(trim($typeide.",".$typeid,",").",".$itemid.",".$dctype.",".$typeid2,",")?>];
 itemid=<? echo $itemid ?>;
 url="//www.fuzzwork.co.uk/blueprints/calc.php?bpid=<? echo $itemid ?>";
 linkurl="//www.fuzzwork.co.uk/blueprints/<? echo $databasenumber."/".$itemid ?>/";
@@ -1049,7 +1062,7 @@ staticurl="//www.fuzzwork.co.uk/blueprints/static/<? echo $itemid ?>/";
 <input type=submit value="Do calculations" />
 </form>
 </div>
-<div id="inventiondialog" title="Invention Calculator" class="hidden">
+<div id="inventiondialog" title="Invention Calculator">
 <form id='calculator' name='calculator'>
 <table>
 <tr><th>Base</th><th>Encryption</th><th>DC 1</th><th>DC 2</th><th>MetaItem</th><th>Decryptor</th><th>Chance</th></tr>
@@ -1115,7 +1128,8 @@ $chance=0;
 <tr><td>Optimized Attainment</td><td>1.9</td><td>+2</td><td>-3</td><td>-5</td></tr>
 </table>
 </div>
-All images are  copyright 2012 CCP hf. All rights reserved. 'EVE', 'EVE Online', 'CCP', and all related logos and images are trademarks or registered trademarks of CCP hf.
-<?php include('/home/web/fuzzwork/analytics.php'); ?>
+</div>
+</div>
+<?php include('/home/web/fuzzwork/htdocs/bootstrap/footer.php'); ?>
 </body>
 </html>

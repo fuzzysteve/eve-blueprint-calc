@@ -6,7 +6,8 @@ require_once('db.inc.php');
 <head>
 <title>BP Costs - Blueprint selection</title>
   <link href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
   <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
   
 <script src="/blueprints/items.js"></script>
@@ -24,11 +25,13 @@ $(document).ready(function() {
     text-decoration: none;
 }
 </style>
-<?php include('/home/web/fuzzwork/htdocs/menu/menuhead.php'); ?>
+<?php include('/home/web/fuzzwork/htdocs/bootstrap/header.php'); ?>
 </head>
 <body>
-<?php include('/home/web/fuzzwork/htdocs/menu/menu.php'); ?>
-<br>
+<?php include('/home/web/fuzzwork/htdocs/menu/menubootstrap.php'); ?>
+<div class="container">
+<div class='row'><div class="span10">
+
 <?
 if (array_key_exists('error',$_GET))
 {
@@ -96,6 +99,10 @@ $marketgroupid=0;
 }
 ?>
 <p>If you save any blueprints, be aware you can only have one set of details per item type (it's keyed on the item id. Editing something seperate requires more major changes). In addition, the saved blueprints are browser specific, and will last for one year from the last update. This is to keep from keeping your details on this server. They're all kept in your cookies.</p>
-<?php include('/home/web/fuzzwork/analytics.php'); ?>
+</div>
+</div>
+</div>
+<?php include('/home/web/fuzzwork/htdocs/bootstrap/footer.php'); ?>
+
 </body>
 </html>
