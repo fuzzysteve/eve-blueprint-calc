@@ -580,12 +580,14 @@ $(document).ready(function() {
       showprices=1;
    }
 
-   $("#togglepricedetail").click(function(){twidth=$("#prices").css('width');$("div#pricedetail").toggle();$("div#prices").css({'height': 'auto','width':twidth});showprices=showprices*-1;createCookie("showprices",showprices,700)});
+   $("#togglepricedetail").click(function(){twidth=$("#prices").css('width');$("div#pricedetail").toggle();$("div#prices").css({'height': 'auto','width':twidth});showprices=showprices*-1;createCookie("showprices",showprices,700); $("#togglepricedetail").toggleClass("glyphicon-chevron-down glyphicon-chevron-up");});
    
    if (showprices==-1)
    {
        twidth=$("#prices").css('width');
        $("div#pricedetail").toggle();
+       $("#togglepricedetail").removeClass("glyphicon-chevron-up");
+       $("#togglepricedetail").addClass("glyphicon-chevron-down");
        $("div#prices").css({'height': 'auto','width':twidth});
    }
   

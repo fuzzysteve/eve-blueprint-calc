@@ -221,9 +221,14 @@ text-decoration:underline;
 <p>Things should now be working right for extra materials and how waste is applied there. Thanks go to <a href="https://gate.eveonline.com/Profile/Lutz%20Major">Lutz Major</a>, and other people from the forum.</p>
 <a href="" id='linkme'>Link to these details</a>&nbsp;|<a href="" id='xmlme'>XML</a>&nbsp;||<a href="" id='xml2me'>Alternate Format XML (with times as well)</a>&nbsp;|<a href="" id='staticme'>Bare Tables</a>&nbsp;|<a href="" id="cookieme">Set your Industry and Production Efficiency in a cookie</a>|
 <a name='savebp' onclick="saveblueprint()" class="marketlink">save blueprint</a>
-<div id="mecalcs">
+<div id="accordion">
+<div id="mecalcs" class="panel panel-default">
+<div class="panel-heading"><h3 class="panel-title"><a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">Materials</a></h3></div>
+<div id="collapseOne" class="panel-collapse collapse in">
+<div class="panel-body">
 <label for="me">Blueprint ME</label><input type=text value=0 id="me" size=3 style='width:3em;margin-right:1em;margin-left:1em'><div id="meslider" style='width:500px;display:inline-block;height:0.5em'></div><br>
 <label for="pe">Manufacturer PE</label><input type=text value=1 id="pe" readonly=y size=1 style='width:1em;margin-right:1em;margin-left:1em'><div id="peslider" style='width:100px;display:inline-block;height:0.5em'></div><br>
+<h2>Base Materials</h2>
 <table border=1 id="basematerials">
 <thead>
 <tr><th>Material</th><th>Perfect</th><th>With ME waste</th><th>With your production waste</th><th>Perfect Cost</th><th>Cost</th><th>Difference</th><th>Waste Eliminated at</th></tr>
@@ -298,8 +303,14 @@ echo "<tr><td>".$row->tn."</td><td>".$row->qn."</td></tr>\n";
 ?>
 </table>
 </div>
-<div id="timecalcs">
-<h2>Time Calculations:</h2>
+</div>
+</div>
+</div>
+<div id="accordion2">
+<div id="timecalcs" class="panel panel-default">
+<div class="panel-heading"><h3 class="panel-title"><a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">Time Calculations</a></h3></div>
+<div id="collapseTwo" class="panel-collapse collapse in">
+<div class="panel-body">
 <label for="prode">Blueprint PE</label><input type=text value=0 id="prode" size=3 style='width:3em;margin-right:1em;margin-left:1em'><div id="prodeslider" style='width:500px;display:inline-block;height:0.5em'></div><br>
 <label for="ind">Manufacturer Industry</label><input type=text value=1 id="ind" readonly=y size=1 style='width:1em;margin-right:1em;margin-left:1em'><div id="indslider" style='width:100px;display:inline-block;height:0.5em'></div><br>
 <table border=1>
@@ -310,18 +321,21 @@ echo "<tr><td>".$row->tn."</td><td>".$row->qn."</td></tr>\n";
 echo '<tr title="The ISK/hr assuming you only put jobs in once a day. 3 hours =24 hours. 10 hours =24 hours. 25 hours=48 hours"><th>iskh 24H rounding</th><td id="peisk24h" align=right>&nbsp;</td><td id=yourisk24h align=right>&nbsp;</td><td id=posisk24h align=right>&nbsp;</td></tr>';
 }?>
 </table>
-<h2>Material Efficiency Research Time</h2>
+<h3>Material Efficiency Research Time</h3>
 <label for="met">Metallurgy</label><input type=text value=0 id="met" size=3 style='width:3em;margin-right:1em;margin-left:1em'><div id="metslider" style='width:500px;display:inline-block;height:0.5em'></div><br>
 <table border=1>
 <tr><th>Base Research time</th><th>Your Time</th><th>POS Time</th></tr>
 <tr><td id="basemetime"><?echo $researchMaterialTime?></td><td id=yourmetime>&nbsp</td><td id=yourmepostime>&nbsp</td></tr>
 </table>
-<h2>Production Efficiency Research Time</h2>
+<h3>Production Efficiency Research Time</h3>
 <label for="research">Research</label><input type=text value=0 id="research" size=3 style='width:3em;margin-right:1em;margin-left:1em'><div id="researchslider" style='width:500px;display:inline-block;height:0.5em'></div><br>
 <table border=1>
 <tr><th>Base Research time</th><th>Your Time</th><th>POS Time</th></tr>
 <tr><td id="basepetime"><?echo $researchProductivityTime?></td><td id=yourpetime>&nbsp</td><td id=yourpepostime>&nbsp</td></tr>
 </table>
+</div>
+</div>
+</div>
 </div>
 <?
 $dctype='';
@@ -331,8 +345,13 @@ if ($metaGroupID == 2)
 $inventionsql="select invTypes.typeid,invTypes.typename,ramTypeRequirements.quantity,chance from $database.ramTypeRequirements,$database.invBlueprintTypes,$database.invTypes,evesupport.inventionChance where producttypeid=? and ramTypeRequirements.typeid=invBlueprintTypes.blueprintTypeID and activityid=8 and invTypes.typeid=requiredTypeID and groupid !=716 and inventionChance.typeid=producttypeid";
 $stmt = $dbh->prepare($inventionsql);
 ?>
-<div id="invention">
-<h1><span onclick='$("#inventiondialog").dialog( "open" );' style="color: blue;text-decoration: underline;">Invention Calculator</span></h1><p><a href="//www.fuzzwork.co.uk/blueprints/inventionxml/<? echo $databasenumber ?>/<? echo $itemid ?>">xml for materials</a></p>
+<div id="accordion3">
+<div id="invention" class="panel panel-default">
+<div class="panel-heading"><h3 class="panel-title"><a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion3" href="#collapseThree">Invention Calculations</a></h3></div>
+<div id="collapseThree" class="panel-collapse collapse in">
+<div class="panel-body">
+<span onclick='$("#inventiondialog").dialog( "open" );' class='btn btn-primary btn-sm'>Open calculator</span>
+<p><a href="//www.fuzzwork.co.uk/blueprints/inventionxml/<? echo $databasenumber ?>/<? echo $itemid ?>">xml for materials</a></p>
 <label for="inventionchance">Invention chance</label><input type=text id="inventionchance" value="40" onchange='runinventionnumbers()'>%<br>
 <label for="inventprofit">Remove from isk/hr</label><input type=checkbox id="inventprofit" onchange='runinventionnumbers()'><br>
 <label for="inventruns">Runs per invention</label><input type=text id="inventruns" value=<? echo $maxruns; ?> disabled><input type=hidden id="baseruns" value=<? echo $maxruns; ?>>
@@ -372,6 +391,9 @@ $dctype=trim($dctype,",");
 
 </table>
 </div>
+</div>
+</div>
+</div>
 <script>noinvent=0;</script>
 <?
 }
@@ -381,9 +403,9 @@ echo "<script>noinvent=1;</script>";
 }
 ?>
 
-<div id="prices" style="position:absolute;<? echo $pricepos;?>">
-    <div id="priceheader" class="ui-widget-header"><span id="togglepricedetail" style="float:right"><img src="/blueprints/collapse.png"></span>Prices</div>
-    <div id="pricedetail">
+<div id="prices" style="position:absolute;<? echo $pricepos;?>" class="panel panel-info">
+    <div id="priceheader" class="panel-heading"><span id="togglepricedetail" style="float:right" class="glyphicon glyphicon-chevron-up"></span>Prices</div>
+    <div id="pricedetail" class="panel-body">
         <div>
             <select id="priceregion" onchange='$.post("/blueprints/loadregion.php",{"region":$("#priceregion").val(),"items":allitems.join(":")},function(data) {updateprices(data);});'>
 <?
