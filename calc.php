@@ -228,6 +228,7 @@ text-decoration:underline;
 <div class="panel-body">
 <label for="me">Blueprint ME</label><input type=text value=0 id="me" size=3 style='width:3em;margin-right:1em;margin-left:1em'><div id="meslider" style='width:500px;display:inline-block;height:0.5em'></div><br>
 <label for="pe">Manufacturer PE</label><input type=text value=1 id="pe" readonly=y size=1 style='width:1em;margin-right:1em;margin-left:1em'><div id="peslider" style='width:100px;display:inline-block;height:0.5em'></div><br>
+<input type=button value="Update ME/PE" onclick="runmenumbers();">
 <h2>Base Materials</h2>
 <table border=1 id="basematerials">
 <thead>
@@ -353,7 +354,7 @@ $stmt = $dbh->prepare($inventionsql);
 <span onclick='$("#inventiondialog").dialog( "open" );' class='btn btn-primary btn-sm'>Open calculator</span>
 <p><a href="//www.fuzzwork.co.uk/blueprints/inventionxml/<? echo $databasenumber ?>/<? echo $itemid ?>">xml for materials</a></p>
 <label for="inventionchance">Invention chance</label><input type=text id="inventionchance" value="40" onchange='runinventionnumbers()'>%<br>
-<label for="inventprofit">Remove from isk/hr</label><input type=checkbox id="inventprofit" onchange='runinventionnumbers()'><br>
+<label for="inventprofit">Subtract from isk/hr</label><input type=checkbox id="inventprofit" onchange='runinventionnumbers()'><br>
 <label for="inventruns">Runs per invention</label><input type=text id="inventruns" value=<? echo $maxruns; ?> disabled><input type=hidden id="baseruns" value=<? echo $maxruns; ?>>
 <table border=1>
 <tr><th>Invention Material Name</th><th>Invention Material Quantity</th><th>Datacore Cost</th></tr>
