@@ -28,7 +28,6 @@ if ((array_key_exists('database',$_POST) &&  is_numeric($_POST['database']))|| (
     }
 
     $sql='select id,version from evesupport.dbversions where id=?';
-
     $stmt = $dbh->prepare($sql);
 
     $stmt->execute(array($dbnum));
@@ -63,7 +62,7 @@ $portionsize=$row->portionSize;
 }
 else
 {
-header('Location: index.php?error=1');
+header('Location: /blueprints/index.php?error=1');
 exit;
 }
 
@@ -227,7 +226,7 @@ text-decoration:underline;
 <div id="collapseOne" class="panel-collapse collapse in">
 <div class="panel-body">
 <label for="me">Blueprint ME</label><input type=text value=0 id="me" size=3 style='width:3em;margin-right:1em;margin-left:1em'><div id="meslider" style='width:500px;display:inline-block;height:0.5em'></div><br>
-<label for="pe">Manufacturer PE</label><input type=text value=1 id="pe" readonly=y size=1 style='width:1em;margin-right:1em;margin-left:1em'><div id="peslider" style='width:100px;display:inline-block;height:0.5em'></div><br>
+<label for="pe">Manufacturer PE</label><input type=text value=1 id="pe" size=1 style='width:1em;margin-right:1em;margin-left:1em'><div id="peslider" style='width:100px;display:inline-block;height:0.5em'></div><br>
 <input type=button value="Update ME/PE" onclick="runmenumbers();">
 <h2>Base Materials</h2>
 <table border=1 id="basematerials">
@@ -340,6 +339,7 @@ echo '<tr title="The ISK/hr assuming you only put jobs in once a day. 3 hours =2
 </div>
 <?
 $dctype='';
+$metatypeid=array();
 if ($metaGroupID == 2)
 {
 
@@ -383,11 +383,19 @@ while ($row = $stmt->fetchObject()){
 }
 
 
+$metatypessql="select invMetaTypes.typeid,coalesce(valuefloat,valueint) level from invMetaTypes join dgmTypeAttributes on (dgmTypeAttributes.typeid=invMetaTypes.typeid and attributeID=633) where metaGroupID=1 and parenttypeid=?";
+$stmt = $dbh->prepare($metatypessql);
+$stmt->execute(array($baseid));
+while ($row = $stmt->fetchObject()){
+    $typeid2.=",".$row->typeid;
+    $metatypeid[$row->level]=$row->typeid;
+}
 
 $typeid2=trim($typeid2,",");
 $dctype=trim($dctype,",");
 ?>
 <tr><td id="displaydecryptor">No Decryptor</td><td id="displaydecryptorq">0</td><td id=displaydecryptorc align='right'></td></tr>
+<tr><td id="displaymetaitem">No metaitem</td><td id="displaymetaitemq">0</td><td id=displaymetaitemc align='right'></td></tr>
 <tr><th colspan=2>Material cost per Successful invention</th><td id='inventtotalcost' align='right'>&nbsp</td></tr>
 
 </table>
@@ -448,7 +456,7 @@ $stmt->execute();
 while ($row = $stmt->fetchObject())
 {
     $name="<img src='//image.eveonline.com/InventoryType/".$row->typeid."_32.png' class='icon32'>".$row->typename;
-    if  (array_key_exists("HTTP_EVE_TRUSTED",$_SERVER)) {$name = "<a name='price-".$row->typeid."' onclick=\"CCPEVE.showMarketDetails(".$row->typeid.")\" class='marketlink'>$name</a>";}
+    if  (array_key_exists("HTTP_EVE_TRUSTED",$_SERVER)) {$name = "<a name='price-".$row->typeid."' id='price-".$row->typeid."' onclick=\"CCPEVE.showMarketDetails(".$row->typeid.")\" class='marketlink'>$name</a>";}
     echo "<tr><td id='toggle-".$row->typeid."' class='togglebuy' title='Toggle buy/sell'>S</td><td>".$name."</td>";
     if ($row->canmake)
     {
@@ -490,6 +498,11 @@ typeid=[<? echo $typeid?>];
 dctypes=[<? echo $dctype?>];
 typeide=[<? echo $typeide?>];
 typetotal=[<? echo trim(trim($typeide.",".$typeid,",").",".$itemid,",")?>];
+metatypes=new Array();
+<? foreach( $metatypeid as $key=>$value){
+ echo "metatypes[$key]=$value;";
+}
+?>
 allitems=[<? echo trim(trim($typeide.",".$typeid,",").",".$itemid.",".$dctype.",".$typeid2,",")?>];
 itemid=<? echo $itemid ?>;
 url="//www.fuzzwork.co.uk/blueprints/calc.php?bpid=<? echo $itemid ?>";

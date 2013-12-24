@@ -149,7 +149,30 @@ function runinventionnumbers()
             document.getElementById("displaydecryptorq").innerHTML=0;
             document.getElementById("displaydecryptorc").innerHTML=0;
         }
-
+       metaitem=parseInt(document.getElementById("metaitem").value)
+       if (metaitem>0)
+       {   
+           if (metatypes[metaitem]===undefined)
+           {
+           document.getElementById("displaymetaitem").innerHTML="No Such Meta Item";
+           document.getElementById("displaymetaitemq").innerHTML="0";
+           document.getElementById("displaymetaitemc").innerHTML="0";
+           }
+           else
+           {
+               document.getElementById("displaymetaitem").innerHTML=document.getElementById("price-"+metatypes[metaitem]).innerHTML;
+               document.getElementById("displaymetaitemq").innerHTML=1;
+               document.getElementById("displaymetaitemc").innerHTML=addIskCommas(document.getElementById(metatypes[metaitem]+ "-jitaprice").innerHTML);
+               totalcost=totalcost+parseFloat(document.getElementById(metatypes[metaitem]+ "-jitaprice").innerHTML);
+           }
+       }
+       else
+       {
+           document.getElementById("displaymetaitem").innerHTML="No Meta Item";
+           document.getElementById("displaymetaitemq").innerHTML="0";
+           document.getElementById("displaymetaitemc").innerHTML="0";
+       }
+   
 
        document.getElementById("inventtotalcost").innerHTML=addIskCommas(((Math.round(totalcost/(inventionchance/100))/100))*100);
        inventioncost=totalcost/(inventionchance/100);

@@ -124,7 +124,7 @@ $typeid[$row->typeid]=1;
 echo "<totalmaterials>\n";
 foreach ($typeid as $key=>$vaule)
 {
-echo '<'.str_replace(" ","_",$typename[$key]).' id="'.$key.'">'.$typeactual[$key].'</'.str_replace(" ","_",$typename[$key]).">\n";
+echo '<type_'.str_replace("/","",str_replace(" ","_",$typename[$key])).' id="'.$key.'">'.$typeactual[$key].'</type_'.str_replace("/","",str_replace(" ","_",$typename[$key])).">\n";
 }
 echo "</totalmaterials>\n";
 echo "</blueprint>";
