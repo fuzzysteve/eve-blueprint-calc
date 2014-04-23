@@ -30,7 +30,7 @@ function runmenumbers()
         document.getElementById(typeid[type] + "-perfectcost").innerHTML=addIskCommas(Math.round(perfect*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100);
          basematerials.fnUpdate(addIskCommas(Math.round(perfect*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100),document.getElementById("basemat-"+typeid[type]),4,0);
         document.getElementById(typeid[type] + "-diff").innerHTML=addCommas(Math.round(((Math.round(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe))))*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100)-(Math.round(perfect*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100))*100)/100);
-        basematerials.fnUpdate(addCommas(Math.round(((Math.round(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe))))*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100)-(Math.round(perfect*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100))*100)/100),document.getElementById("basemat-"+typeid[type]),6,0); 
+        basematerials.fnUpdate(addCommas(Math.round(((Math.round(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe))))*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100)-(Math.round(perfect*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100))*100)/100),document.getElementById("basemat-"+typeid[type]),6,0);
         total=total+Math.round(Math.round(perfect+(perfect*wasteage)+(perfect*(0.25-(0.05*pe))))*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100;
         perfecttotal=perfecttotal+Math.round(perfect*parseFloat(document.getElementById(typeid[type] + "-jitaprice").innerHTML)*100)/100;
         if (me>=Math.floor(perfect*((waste/100)/0.5)))
@@ -75,9 +75,9 @@ function runmenumbers()
 }
 
 function runpenumbers()
-{ 
+{
     prode=parseInt(document.getElementById("prode").value);
-    
+
 
     if (prode<0)
     {
@@ -129,19 +129,19 @@ function runinventionnumbers()
     {
         inventionchance=parseFloat(document.getElementById("inventionchance").value);
         totalcost=0;
-        for (dctype in dctypes) 
+        for (dctype in dctypes)
         {
             document.getElementById("inventcost-"+dctypes[dctype]).innerHTML=addIskCommas(Math.round((parseFloat(document.getElementById("inventquantity-"+dctypes[dctype]).innerHTML)*document.getElementById(dctypes[dctype] + "-jitaprice").innerHTML)*100)/100);
             totalcost=totalcost+Math.round((parseFloat(document.getElementById("inventquantity-"+dctypes[dctype]).innerHTML)*document.getElementById(dctypes[dctype] + "-jitaprice").innerHTML)*100)/100;
         }
         decryptor=$('input:radio[name=decryptor]:checked').val();
         if (decryptor != "none" )
-        { 
+        {
             document.getElementById("displaydecryptor").innerHTML=document.getElementById("decryptorname-"+decryptor).innerHTML;
             document.getElementById("displaydecryptorq").innerHTML=1;
             document.getElementById("displaydecryptorc").innerHTML=addIskCommas(document.getElementById(document.getElementById("decryptorid-"+decryptor).innerHTML + "-jitaprice").innerHTML);
             totalcost=totalcost+parseFloat(document.getElementById(document.getElementById("decryptorid-"+decryptor).innerHTML + "-jitaprice").innerHTML);
-            
+
         }
         else
         {
@@ -151,7 +151,7 @@ function runinventionnumbers()
         }
        metaitem=parseInt(document.getElementById("metaitem").value)
        if (metaitem>0)
-       {   
+       {
            if (metatypes[metaitem]===undefined)
            {
            document.getElementById("displaymetaitem").innerHTML="No Such Meta Item";
@@ -172,7 +172,7 @@ function runinventionnumbers()
            document.getElementById("displaymetaitemq").innerHTML="0";
            document.getElementById("displaymetaitemc").innerHTML="0";
        }
-   
+
 
        document.getElementById("inventtotalcost").innerHTML=addIskCommas(((Math.round(totalcost/(inventionchance/100))/100))*100);
        inventioncost=totalcost/(inventionchance/100);
@@ -191,18 +191,18 @@ function updatelink()
     urltoxml=xmlurl+me+"/"+pe;
     urltoxml2=xml2url+me+"/"+pe+"/"+prode+"/"+ind;
     urltostatic=staticurl+me+"/"+pe;
-    urltocookie=url+"&mpe="+pe+"&ind="+ind+"&setcookie=1";
+    urltocookie=url+"&mpe="+pe+"&ind="+ind+"&metallurgy="+metallurgy+"&research="+research+"&setcookie=1";
     document.getElementById("cookieme").href=urltocookie;
     document.getElementById("linkme").href=urltoshow;
     document.getElementById("xmlme").href=urltoxml;
     document.getElementById("xml2me").href=urltoxml2;
     document.getElementById("staticme").href=urltostatic;
-    document.getElementById("clearprice").href=urltoshow+"/clearprice";
+    document.getElementById("clearprice").href=urltoshow+"?clearprice=1";
     document.getElementById("nextsearch").action="/blueprints/calc.php?mpe="+pe+"&ind="+ind;
 }
 
 
-function toggleprice() 
+function toggleprice()
 {
     $('td.priceedit').toggleClass('hidden')
     $('a.priceedit').toggleClass('hidden')
@@ -268,7 +268,7 @@ function saveprice()
                         }
                 }
         }
-   var priceurl="//www.fuzzwork.co.uk/blueprints/prices.php";
+   var priceurl="/blueprints/prices.php";
    var params="prices="+stringPrice;
    ajaxRequest.open("POST",priceurl,true);
    ajaxRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -305,7 +305,7 @@ function saveblueprint()
                         }
                 }
         }
-   var saveurl="//www.fuzzwork.co.uk/blueprints/savebp.php";
+   var saveurl="/blueprints/savebp.php";
    var params="typeid="+itemid+"&me="+parseInt(document.getElementById("me").value)+"&pe="+parseInt(document.getElementById("prode").value);
    ajaxRequest.open("GET",saveurl+"?"+params,true);
    ajaxRequest.onreadystatechange = function() {//Call a function when the state changes.
@@ -413,10 +413,10 @@ $(function() {
 
 
 	$(function() {
-		$( "#prices" ).draggable({ handle: "#priceheader" }).mouseup(function(){  
-                    var coords=[];  
-                    var coord = $(this).position();  
-                    var item={ coordTop:  Math.floor(coord.top), coordLeft: Math.floor(coord.left),width: $("#prices").css('width') };  
+		$( "#prices" ).draggable({ handle: "#priceheader" }).mouseup(function(){
+                    var coords=[];
+                    var coord = $(this).position();
+                    var item={ coordTop:  Math.floor(coord.top), coordLeft: Math.floor(coord.left),width: $("#prices").css('width') };
                     coords.push(item);
                     createCookie("pricepos",JSON.stringify(coords),700);
                  });
@@ -604,7 +604,7 @@ $(document).ready(function() {
    }
 
    $("#togglepricedetail").click(function(){twidth=$("#prices").css('width');$("div#pricedetail").toggle();$("div#prices").css({'height': 'auto','width':twidth});showprices=showprices*-1;createCookie("showprices",showprices,700); $("#togglepricedetail").toggleClass("glyphicon-chevron-down glyphicon-chevron-up");});
-   
+
    if (showprices==-1)
    {
        twidth=$("#prices").css('width');
@@ -613,6 +613,6 @@ $(document).ready(function() {
        $("#togglepricedetail").addClass("glyphicon-chevron-down");
        $("div#prices").css({'height': 'auto','width':twidth});
    }
-  
- 
+
+
 });

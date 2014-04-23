@@ -1,6 +1,67 @@
-body { background-color:#D9D9D9}
-td {background-color:#EEEEEE}
-.icon32 {vertical-align:middle;}
-.icon64 {vertical-align:middle;}
-.perfect {background-color:green;}
-#priceheader {margin-top:0;margin-bottom:0;text-align:center; width:100%;font-size:1.875em;cursor:move}
+body {
+	cursor				: default;
+	background-color	: #d9d9d9;
+}
+
+td {
+	background-color	: #eeeeee;
+}
+
+.icon32 {
+	vertical-align		: middle;
+}
+
+.icon64 {
+	vertical-align		: middle;
+}
+
+.perfect {
+	background-color	: green;
+}
+
+#priceheader {
+	margin-top			: 0;
+	margin-bottom		: 0;
+	text-align			: center;
+	width				: 100%;
+	font-size			: 1.875em;
+	cursor				: move;
+}
+
+.ui-menu .ui-menu-item a {
+	display				: block;
+	line-height			: 1;
+	padding				: 0.2em 0.4em;
+	text-decoration		: none;
+}
+
+div.jqDrag {
+	cursor				: move;
+}
+
+.jitaprice {
+	display				: table-cell;
+}
+
+.priceedit {
+	 display			: table-cell;
+}
+
+.hidden {
+	display				: none;
+}
+
+.marketlink {
+	color				: blue;
+	text-decoration		: underline;
+}
+
+.togglebuy {
+	width				: 1em;
+}
+
+.dataTable {
+	width				: auto !important;
+	clear				: none !important;
+	margin				: 0 !important;
+}

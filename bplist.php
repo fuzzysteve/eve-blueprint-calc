@@ -1,10 +1,6 @@
 <?php
 require_once('db.inc.php');
-
-
-$pricetype='redis';
-require_once($pricetype.'price.php');
-
+require_once(__DIR__.'/Price/Price.php');
 
 $mpe=0;
 $industry=1;
@@ -174,7 +170,7 @@ $productiontime=($detailrow->productionTime*(1-(($detailrow->productivityModifie
 $productiontime=($productiontime*(1-(0.04*$industry)))/3600;
 
 
-echo "<tr><td>".$typeid."</td><td><a href=\"//www.fuzzwork.co.uk/blueprints/".$productlookup[$typeid]."/$me/$pe\" target='_blank'>".$typenamelookup[$typeid]."</a></td><td>".$inventory[$blueprint]."</td><td>$me</td><td>$pe</td><td>$copy</td><td>\n";
+echo "<tr><td>".$typeid."</td><td><a href=\"/blueprints/".$productlookup[$typeid]."/$me/$pe\" target='_blank'>".$typenamelookup[$typeid]."</a></td><td>".$inventory[$blueprint]."</td><td>$me</td><td>$pe</td><td>$copy</td><td>\n";
 
 
 echo round(($detailrow->portionSize*$itemprice)-($pricerow->totalprice),2);
@@ -200,7 +196,7 @@ if ($me==-4)
 else
 {
 echo "N/A";
-} 
+}
 
 
 echo "</td></tr>\n";

@@ -1,10 +1,7 @@
 <table border=1>
 <?php
-$pricetype='redis';
-#$pricetype='memcache';
-#$pricetype='marketdata';
 $database="eve";
-require_once($pricetype.'price.php');
+require_once(__DIR__.'/Price/Price.php');
 
 require_once('db.inc.php');
 
