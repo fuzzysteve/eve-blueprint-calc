@@ -1,9 +1,5 @@
 <?php
-$pricetype='redis';
-#$pricetype='memcache';
-#$pricetype='marketdata';
-
-require_once($pricetype.'price.php');
+require_once(__DIR__'/Price/Price.php');
 
 require_once('db.inc.php');
 $ignoreprice=0;
@@ -264,7 +260,7 @@ $typeid=trim($typeid,",");
 <?}?>
 </tfoot>
 </table>
-<p>A no waste ME is: <? $nowaste=floor($max*(($wasteFactor/100)/0.5)); echo $nowaste; 
+<p>A no waste ME is: <? $nowaste=floor($max*(($wasteFactor/100)/0.5)); echo $nowaste;
 ?></p>
 <h2>Extra Materials</h2>
 <table border=1 id="extramaterials"><thead>
@@ -469,12 +465,12 @@ while ($row = $stmt->fetchObject())
 
     echo "<td id=\"".$row->typeid.'-jitaprice" align=right class=jitaprice>';
     if (isset($cookieprice) && array_key_exists($row->typeid,$cookieprice) && is_numeric($cookieprice[$row->typeid])&&!$ignoreprice)
-    {  
+    {
        $price=$cookieprice[$row->typeid];
        echo $cookieprice[$row->typeid];
     }
     else
-    { 
+    {
         list($price,$pricebuy)=returnprice($row->typeid);
         echo $price;
 

@@ -1,10 +1,6 @@
 <?php
 require_once('db.inc.php');
-
-
-$pricetype='redis';
-require_once($pricetype.'price.php');
-
+require_once(__DIR__.'/Price/Price.php');
 
 $mpe=0;
 $industry=1;
@@ -200,7 +196,7 @@ if ($me==-4)
 else
 {
 echo "N/A";
-} 
+}
 
 
 echo "</td></tr>\n";

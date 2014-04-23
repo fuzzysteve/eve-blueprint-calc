@@ -1,10 +1,5 @@
 <?php
-
-$pricetype='redis';
-#$pricetype='memcache';
-#$pricetype='marketdata';
-
-require_once($pricetype.'price.php');
+require_once(__DIR__.'/Price/Price.php');
 
 require_once('db.inc.php');
 $ignoreprice=0;
@@ -144,7 +139,7 @@ function runmenumbers()
 
 
 
-function toggleprice() 
+function toggleprice()
 {
     $('td.priceedit').toggleClass('hidden')
     $('a.priceedit').toggleClass('hidden')
@@ -215,10 +210,10 @@ function setme(menumber)
 waste=<? echo $wasteFactor; ?>;
 
 	$(function() {
-		$( "#prices" ).draggable().mouseup(function(){  
-                    var coords=[];  
-                    var coord = $(this).position();  
-                    var item={ coordTop:  Math.floor(coord.top), coordLeft: Math.floor(coord.left),width: $("#prices").css('width') };  
+		$( "#prices" ).draggable().mouseup(function(){
+                    var coords=[];
+                    var coord = $(this).position();
+                    var item={ coordTop:  Math.floor(coord.top), coordLeft: Math.floor(coord.left),width: $("#prices").css('width') };
                     coords.push(item);
                     createCookie("pricepos",JSON.stringify(coords),700);
                  }).resizable({stop: function(){
@@ -313,7 +308,7 @@ $typeid=trim($typeid,",");
 <tr><td colspan=3>Total with Extra materials</td><td id=overalltotal align=right>&nbsp;</td><td></td><td id='overallruntotal'></td></tr>
 <tr><td colspan=3>Sell Price</td><td id="<? echo $itemid?>-cost" align=right>&nbsp;</td><td></td><td id=sellruntotal align=right>&nbsp;</td></tr>
 </table>
-<p>A no waste ME is: <? $nowaste=floor($max*(($wasteFactor/100)/0.5)); echo $nowaste; 
+<p>A no waste ME is: <? $nowaste=floor($max*(($wasteFactor/100)/0.5)); echo $nowaste;
 ?></p>
 <h2>Extra Materials</h2>
 <table border=1>
@@ -375,7 +370,7 @@ while ($row = $stmt->fetchObject())
     if  (array_key_exists("HTTP_EVE_TRUSTED",$_SERVER)) {$name = "<a name='price-".$row->typeid."' onclick=\"CCPEVE.showMarketDetails(".$row->typeid.")\" class='marketlink'>$name</a>";}
     echo "<tr><td>".$name."</td><td id=\"".$row->typeid.'-jitaprice" align=right class=jitaprice>';
     if (array_key_exists($row->typeid,$cookieprice) && is_numeric($cookieprice[$row->typeid])&&!$ignoreprice)
-    {  
+    {
        $price=$cookieprice[$row->typeid];
        echo $cookieprice[$row->typeid];
     }
