@@ -26,7 +26,7 @@ require_once('db.inc.php');
 	</head>
 	<body>
 		<?php
-		if(file_exists('/home/web/fuzzwork/htdocs/menu/menubootstrap.php') {
+		if(file_exists('/home/web/fuzzwork/htdocs/menu/menubootstrap.php')) {
 			include('/home/web/fuzzwork/htdocs/menu/menubootstrap.php');
 		}
 		?>
@@ -65,7 +65,7 @@ require_once('db.inc.php');
 					<a href="/blueprints/enterlist.php">Form based Entry</a> - Cut and paste a list from your S&amp;I screen, to have links generated for you.<br/>
 
 					<?php
-					if(isset($_COOKIE['blueprints']) {
+					if(isset($_COOKIE['blueprints'])) {
 						$currentstructure = json_decode(stripslashes($_COOKIE['blueprints']),true);
 						$keys='';
 						foreach(array_keys($currentstructure) as $key) {

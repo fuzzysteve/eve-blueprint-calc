@@ -34,3 +34,34 @@ td {
 	padding				: 0.2em 0.4em;
 	text-decoration		: none;
 }
+
+div.jqDrag {
+	cursor				: move;
+}
+
+.jitaprice {
+	display				: table-cell;
+}
+
+.priceedit {
+	 display			: table-cell;
+}
+
+.hidden {
+	display				: none;
+}
+
+.marketlink {
+	color				: blue;
+	text-decoration		: underline;
+}
+
+.togglebuy {
+	width				: 1em;
+}
+
+.dataTable {
+	width				: auto !important;
+	clear				: none !important;
+	margin				: 0 !important;
+}

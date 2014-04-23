@@ -182,7 +182,7 @@ function saveprice()
                         }
                 }
         }
-   var priceurl="//www.fuzzwork.co.uk/blueprints/prices.php";
+   var priceurl="/blueprints/prices.php";
    var params="prices="+stringPrice;
    ajaxRequest.open("POST",priceurl,true);
    ajaxRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -395,8 +395,8 @@ typeid=[<? echo $typeid?>];
 typeide=[<? echo $typeide?>];
 typetotal=[<? echo trim(trim($typeide.",".$typeid,",").",".$itemid,",")?>];
 itemid=<? echo $itemid ?>;
-url="//www.fuzzwork.co.uk/blueprints/calc.php?bpid=<? echo $itemid ?>";
-linkurl="//www.fuzzwork.co.uk/blueprints/<? echo $itemid ?>/";
+url="/blueprints/calc.php?bpid=<? echo $itemid ?>";
+linkurl="/blueprints/<? echo $itemid ?>/";
 </script>
 <br><br>
 </div>
