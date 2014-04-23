@@ -16,14 +16,7 @@ require_once('db.inc.php');
 		});
 		</script>
 
-		<style>
-		.ui-menu .ui-menu-item a {
-			display: block;
-			line-height: 1;
-			padding: 0.2em 0.4em;
-			text-decoration: none;
-		}
-		</style>
+		<link rel="stylesheet" type="text/css" href="/blueprints/main.css"/>
 
 		<?php
 		if(file_exists('/home/web/fuzzwork/htdocs/bootstrap/header.php')) {
