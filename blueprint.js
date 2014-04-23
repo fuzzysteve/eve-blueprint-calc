@@ -197,7 +197,7 @@ function updatelink()
     document.getElementById("xmlme").href=urltoxml;
     document.getElementById("xml2me").href=urltoxml2;
     document.getElementById("staticme").href=urltostatic;
-    document.getElementById("clearprice").href=urltoshow+"/clearprice";
+    document.getElementById("clearprice").href=urltoshow+"/?clearprice=1";
     document.getElementById("nextsearch").action="/blueprints/calc.php?mpe="+pe+"&ind="+ind;
 }
 
